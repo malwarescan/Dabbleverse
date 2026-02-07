@@ -5,6 +5,8 @@ nixPkgs = ['nodejs_20', 'npm-10_x', 'openssl']
 cmds = ['echo "Cache bust: $(date +%s)"', 'rm -rf .next node_modules/.cache', 'npm ci']
 
 [phases.build]
+# Disable cache mounts to force clean rebuild
+cacheDirectories = []
 cmds = ['npm run build']
 
 [start]
