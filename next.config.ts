@@ -7,10 +7,8 @@ const nextConfig: NextConfig = {
   // Force all pages to be dynamic (no static generation during build)
   output: 'standalone',
   
-  // Skip static page optimization
-  experimental: {
-    optimizePackageImports: ['@/components'],
-  },
+  // Completely disable static generation
+  generateBuildId: async () => 'build',
 };
 
 export default nextConfig;

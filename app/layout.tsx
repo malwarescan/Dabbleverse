@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Dabbleverse Dashboard | Cultural Stock Ticker",
-  description: "Real-time ranking of Characters, Storylines, and Shows across YouTube and Reddit",
-  keywords: ["dabbleverse", "dashboard", "scoreboard", "YouTube", "Reddit"],
+  title: "Dabbleverse Dashboard",
+  description: "Real-time cultural stock ticker",
 };
 
 export default function RootLayout({
@@ -20,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="antialiased">{children}</body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
   );
 }
