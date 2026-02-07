@@ -3,8 +3,9 @@ import { Pool } from 'pg';
 import * as schema from './schema';
 
 // Create connection pool
+// Note: DATABASE_URL should be set in runtime, but may not be available during build
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/placeholder',
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
