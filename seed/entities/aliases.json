@@ -1,0 +1,285 @@
+{
+  "$schema": "../schemas/aliases.schema.json",
+  "aliases": [
+    {
+      "entity_id": "char-stuttering-john",
+      "alias_text": "stuttering john",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-stuttering-john",
+      "alias_text": "john melendez",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-stuttering-john",
+      "alias_text": "stutjo",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 0.9
+    },
+    {
+      "entity_id": "char-stuttering-john",
+      "alias_text": "sj",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 0.7
+    },
+    {
+      "entity_id": "char-bob-levy",
+      "alias_text": "bob levy",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-bob-levy",
+      "alias_text": "fat bob",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 0.95
+    },
+    {
+      "entity_id": "char-opie",
+      "alias_text": "opie",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-opie",
+      "alias_text": "gregg hughes",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-steel-toe",
+      "alias_text": "steel toe",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-steel-toe",
+      "alias_text": "aaron imholte",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-vic",
+      "alias_text": "vic",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-vic",
+      "alias_text": "vince the lawyer",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 0.95
+    },
+    {
+      "entity_id": "char-vic",
+      "alias_text": "vince",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 0.85
+    },
+    {
+      "entity_id": "char-doug",
+      "alias_text": "doug",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-doug",
+      "alias_text": "good times great movies",
+      "match_type": "contains",
+      "platform_scope": "any",
+      "confidence_weight": 0.9
+    },
+    {
+      "entity_id": "char-andrea-landis",
+      "alias_text": "andrea landis",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-andrea-landis",
+      "alias_text": "nylo",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 0.95
+    },
+    {
+      "entity_id": "char-army-major",
+      "alias_text": "army major",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-army-major",
+      "alias_text": "richard ojeda",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-karl-hamburger",
+      "alias_text": "karl hamburger",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-karl-hamburger",
+      "alias_text": "karl",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 0.7
+    },
+    {
+      "entity_id": "char-shuli-egar",
+      "alias_text": "shuli egar",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-shuli-egar",
+      "alias_text": "shuli",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 0.85
+    },
+    {
+      "entity_id": "char-kevin-brennan",
+      "alias_text": "kevin brennan",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-chad-zumock",
+      "alias_text": "chad zumock",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-clearwater-chad",
+      "alias_text": "clearwater chad",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-scarlett-hampton",
+      "alias_text": "scarlett hampton",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-big-dub",
+      "alias_text": "big dub",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-cardiff-electric",
+      "alias_text": "cardiff electric",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-cardiff-electric",
+      "alias_text": "cardiff",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 0.8
+    },
+    {
+      "entity_id": "char-producer-joe",
+      "alias_text": "producer joe",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-anthony-cumia",
+      "alias_text": "anthony cumia",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-joe-cumia",
+      "alias_text": "joe cumia",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-jim-norton",
+      "alias_text": "jim norton",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-artie-lange",
+      "alias_text": "artie lange",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-lady-k",
+      "alias_text": "lady k",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-patrick-melton",
+      "alias_text": "patrick melton",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-blind-mike",
+      "alias_text": "blind mike",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-chrissie-mayr",
+      "alias_text": "chrissie mayr",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    },
+    {
+      "entity_id": "char-ethan-ralph",
+      "alias_text": "ethan ralph",
+      "match_type": "exact",
+      "platform_scope": "any",
+      "confidence_weight": 1.0
+    }
+  ]
+}

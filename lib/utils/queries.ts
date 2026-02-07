@@ -1,0 +1,146 @@
+import { db, scores, feedCards, entities } from '@/lib/db';
+import { eq, desc, and } from 'drizzle-orm';
+import { WindowType, ScoreboardRow, MoverCard, FeedCardData } from '@/lib/types';
+
+export async function getScoreboardRows(
+  window: WindowType,
+  limit: number = 50
+): Promise<ScoreboardRow[]> {
+  try {
+    // Get the most recent computation time for this window with entity join
+    const latestScores = await db
+      .select({
+        rank: scores.rank,
+        deltaRank: scores.deltaRank,
+        entityId: scores.entityId,
+        score: scores.score,
+        momentum: scores.momentum,
+        microMomentum: scores.microMomentum,
+        sourcesBreakdown: scores.sourcesBreakdown,
+        driverLabel: scores.driverLabel,
+        eventCount: scores.eventCount,
+        computedAt: scores.computedAt,
+        entityName: entities.canonicalName,
+        entityType: entities.type,
+      })
+      .from(scores)
+      .innerJoin(entities, eq(scores.entityId, entities.id))
+      .where(eq(scores.window, window))
+      .orderBy(desc(scores.computedAt), scores.rank)
+      .limit(limit);
+
+    if (latestScores.length === 0) {
+      return [];
+    }
+
+    // Transform to ScoreboardRow format
+    return latestScores.map((score) => ({
+      rank: score.rank,
+      deltaRank: score.deltaRank,
+      entityId: score.entityId,
+      name: score.entityName,
+      type: score.entityType as any,
+      score: parseFloat(score.score.toString()),
+      momentum: parseFloat(score.momentum.toString()),
+      microMomentum: score.microMomentum ? parseFloat(score.microMomentum.toString()) : undefined,
+      sources: score.sourcesBreakdown as any,
+      driver: score.driverLabel || null,
+      eventCount: score.eventCount,
+    }));
+  } catch (error) {
+    console.error('Error fetching scoreboard:', error);
+    return [];
+  }
+}
+
+export async function getMovers(
+  window: WindowType,
+  limit: number = 20
+): Promise<MoverCard[]> {
+  try {
+    // Get scores with entity join ordered by absolute momentum
+    const topMovers = await db
+      .select({
+        entityId: scores.entityId,
+        momentum: scores.momentum,
+        microMomentum: scores.microMomentum,
+        driverLabel: scores.driverLabel,
+        sourcesBreakdown: scores.sourcesBreakdown,
+        eventCount: scores.eventCount,
+        computedAt: scores.computedAt,
+        entityName: entities.canonicalName,
+        entityType: entities.type,
+      })
+      .from(scores)
+      .innerJoin(entities, eq(scores.entityId, entities.id))
+      .where(eq(scores.window, window))
+      .orderBy(desc(scores.computedAt))
+      .limit(100); // Get more to sort by momentum
+
+    if (topMovers.length === 0) {
+      return [];
+    }
+
+    // Sort by absolute momentum and take top movers
+    const sorted = topMovers
+      .sort((a, b) => Math.abs(parseFloat(b.momentum.toString())) - Math.abs(parseFloat(a.momentum.toString())))
+      .slice(0, limit);
+
+    return sorted.map((score) => ({
+      entityId: score.entityId,
+      name: score.entityName,
+      type: score.entityType as any,
+      momentum: parseFloat(score.momentum.toString()),
+      microMomentum: score.microMomentum ? parseFloat(score.microMomentum.toString()) : undefined,
+      driver: score.driverLabel || null,
+      sources: score.sourcesBreakdown as any,
+      receiptCount: score.eventCount,
+    }));
+  } catch (error) {
+    console.error('Error fetching movers:', error);
+    return [];
+  }
+}
+
+export async function getFeedCards(
+  window: WindowType,
+  limit: number = 50
+): Promise<FeedCardData[]> {
+  try {
+    const cards = await db
+      .select()
+      .from(feedCards)
+      .where(eq(feedCards.window, window))
+      .orderBy(desc(feedCards.computedAt))
+      .limit(limit);
+
+    return cards.map((card) => {
+      // Parse meta if it's a string
+      let meta;
+      try {
+        meta = typeof card.meta === 'string' ? JSON.parse(card.meta) : card.meta;
+      } catch {
+        meta = {
+          author: 'Unknown',
+          channel: '',
+          timestamp: new Date().toISOString(),
+          platform: card.source,
+        };
+      }
+      
+      return {
+        id: card.id,
+        source: card.source,
+        title: card.title,
+        meta,
+        why: card.why,
+        url: card.url,
+        eventId: card.eventId,
+        entityIds: (card.entityIds as string[]) || [],
+      };
+    });
+  } catch (error) {
+    console.error('Error fetching feed cards:', error);
+    return [];
+  }
+}

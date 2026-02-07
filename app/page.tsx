@@ -1,65 +1,122 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState, useEffect } from 'react';
+import { Masthead } from '@/components/scoreboard/Masthead';
+import { ScoreboardTable } from '@/components/scoreboard/ScoreboardTable';
+import { MoversRail } from '@/components/scoreboard/MoversRail';
+import { CategoryCards } from '@/components/scoreboard/CategoryCards';
+import { TickerDock } from '@/components/ticker/TickerDock';
+import {
+  WindowType,
+  ScoreboardResponse,
+  MoversResponse,
+  FeedResponse,
+} from '@/lib/types';
+
+export default function HomePage() {
+  const [currentWindow, setCurrentWindow] = useState<WindowType>('now');
+  const [scoreboardData, setScoreboardData] = useState<ScoreboardResponse | null>(null);
+  const [moversData, setMoversData] = useState<MoversResponse | null>(null);
+  const [feedData, setFeedData] = useState<FeedResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch data
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const [scoreboard, movers, feed] = await Promise.all([
+        fetch(`/api/scoreboard?window=${currentWindow}`).then((r) => r.json()),
+        fetch(`/api/movers?window=${currentWindow}`).then((r) => r.json()),
+        fetch(`/api/feed?window=${currentWindow}`).then((r) => r.json()),
+      ]);
+
+      setScoreboardData(scoreboard);
+      setMoversData(movers);
+      setFeedData(feed);
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial fetch
+  useEffect(() => {
+    fetchData();
+  }, [currentWindow]);
+
+  // Auto-refresh every 60 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchData();
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [currentWindow]);
+
+  // Filter by entity type for category cards
+  const characters = scoreboardData?.rows.filter((r) => r.type === 'character') || [];
+  const storylines = scoreboardData?.rows.filter((r) => r.type === 'storyline') || [];
+  const shows = scoreboardData?.rows.filter((r) => r.type === 'show') || [];
+  const chatters = scoreboardData?.rows.filter((r) => r.type === 'chatter') || [];
+  const clippers = scoreboardData?.rows.filter((r) => r.type === 'clipper') || [];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <div className="min-h-screen pb-[240px] md:pb-[210px]" style={{ backgroundColor: 'var(--color-broadcast-bg)' }}>
+      {/* Masthead */}
+      <Masthead
+        currentWindow={currentWindow}
+        onWindowChange={setCurrentWindow}
+        lastUpdate={scoreboardData?.computedAt}
+      />
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-8">
+        {loading && !scoreboardData ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-sm md:text-base" style={{ color: 'var(--color-text-tertiary)' }}>
+              Loading scoreboard...
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Two-column layout: Scoreboard + Rail */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 md:gap-6 mb-6 md:mb-8">
+              {/* Left: Primary Scoreboard */}
+              <div>
+                <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">
+                  Top Characters
+                </h2>
+                <ScoreboardTable
+                  rows={characters.slice(0, 10) || []}
+                  onRowClick={(row) => {
+                    console.log('Row clicked:', row);
+                    // TODO: Navigate to entity page in Phase 2
+                  }}
+                />
+              </div>
+
+              {/* Right: What Moved Rail */}
+              <div>
+                <MoversRail movers={moversData?.movers || []} />
+              </div>
+            </div>
+
+            {/* Category Cards */}
+            <CategoryCards
+              characters={characters}
+              storylines={storylines}
+              shows={shows}
+              chatters={chatters}
+              clippers={clippers}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+          </>
+        )}
+      </div>
+
+      {/* Bottom Ticker Dock */}
+      <TickerDock cards={feedData?.cards || []} />
     </div>
   );
 }

@@ -1,0 +1,397 @@
+{
+  "$schema": "../schemas/entities.schema.json",
+  "entities": [
+    {
+      "id": "char-stuttering-john",
+      "type": "character",
+      "canonical_name": "Stuttering John Melendez",
+      "description": "Radio personality and podcaster",
+      "enabled": true
+    },
+    {
+      "id": "char-karl-hamburger",
+      "type": "character",
+      "canonical_name": "Karl Hamburger",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-shuli-egar",
+      "type": "character",
+      "canonical_name": "Shuli Egar",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-bob-levy",
+      "type": "character",
+      "canonical_name": "Bob Levy",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-kevin-brennan",
+      "type": "character",
+      "canonical_name": "Kevin Brennan",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-chad-zumock",
+      "type": "character",
+      "canonical_name": "Chad Zumock",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-clearwater-chad",
+      "type": "character",
+      "canonical_name": "Clearwater Chad",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-scarlett-hampton",
+      "type": "character",
+      "canonical_name": "Scarlett Hampton",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-big-dub",
+      "type": "character",
+      "canonical_name": "Big Dub",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-cardiff-electric",
+      "type": "character",
+      "canonical_name": "Cardiff Electric",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-producer-joe",
+      "type": "character",
+      "canonical_name": "Producer Joe",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-tookie",
+      "type": "character",
+      "canonical_name": "Tookie",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-noz",
+      "type": "character",
+      "canonical_name": "Noz",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-vinnie-paulino",
+      "type": "character",
+      "canonical_name": "Vinnie Paulino",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-anthony-cumia",
+      "type": "character",
+      "canonical_name": "Anthony Cumia",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-joe-cumia",
+      "type": "character",
+      "canonical_name": "Joe Cumia",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-opie",
+      "type": "character",
+      "canonical_name": "Opie",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-jim-norton",
+      "type": "character",
+      "canonical_name": "Jim Norton",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-artie-lange",
+      "type": "character",
+      "canonical_name": "Artie Lange",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-mike-morse",
+      "type": "character",
+      "canonical_name": "Mike Morse",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-lady-k",
+      "type": "character",
+      "canonical_name": "Lady K",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-patrick-melton",
+      "type": "character",
+      "canonical_name": "Patrick Melton",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-steel-toe",
+      "type": "character",
+      "canonical_name": "Steel Toe",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-april-imholte",
+      "type": "character",
+      "canonical_name": "April Imholte",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-blind-mike",
+      "type": "character",
+      "canonical_name": "Blind Mike",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-eric-zane",
+      "type": "character",
+      "canonical_name": "Eric Zane",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-chrissie-mayr",
+      "type": "character",
+      "canonical_name": "Chrissie Mayr",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-bryan-johnson",
+      "type": "character",
+      "canonical_name": "Bryan Johnson",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-vic",
+      "type": "character",
+      "canonical_name": "Vic",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-keanu-thompson",
+      "type": "character",
+      "canonical_name": "Keanu Thompson",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-ray-devito",
+      "type": "character",
+      "canonical_name": "Ray DeVito",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-brendan-sagalow",
+      "type": "character",
+      "canonical_name": "Brendan Sagalow",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-aaron-berg",
+      "type": "character",
+      "canonical_name": "Aaron Berg",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-geno-bisconte",
+      "type": "character",
+      "canonical_name": "Geno Bisconte",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-drew-lane",
+      "type": "character",
+      "canonical_name": "Drew Lane",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-doug",
+      "type": "character",
+      "canonical_name": "Doug",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-jamie-lorello",
+      "type": "character",
+      "canonical_name": "Jamie Lorello",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-joey-c",
+      "type": "character",
+      "canonical_name": "Joey C",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-lucy-tightbox",
+      "type": "character",
+      "canonical_name": "Lucy Tightbox",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-sal-d",
+      "type": "character",
+      "canonical_name": "Sal D",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-chille-decastro",
+      "type": "character",
+      "canonical_name": "Chille DeCastro",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-ava-raiza",
+      "type": "character",
+      "canonical_name": "Ava Raiza",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-andrea-landis",
+      "type": "character",
+      "canonical_name": "Andrea Landis",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-benniloco",
+      "type": "character",
+      "canonical_name": "Benniloco",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-bill-burr",
+      "type": "character",
+      "canonical_name": "Bill Burr",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-adam-busch",
+      "type": "character",
+      "canonical_name": "Adam Busch",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-adam-post",
+      "type": "character",
+      "canonical_name": "Adam Post",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-ali-weezy",
+      "type": "character",
+      "canonical_name": "Ali Weezy",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-army-major",
+      "type": "character",
+      "canonical_name": "Army Major",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-jay-moe",
+      "type": "character",
+      "canonical_name": "Jay Moe",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-stealthkaos",
+      "type": "character",
+      "canonical_name": "StealthKaos",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-dr-chow",
+      "type": "character",
+      "canonical_name": "DR Chow",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-lil-mir",
+      "type": "character",
+      "canonical_name": "Lil Mir",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-quadfather",
+      "type": "character",
+      "canonical_name": "Quadfather",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-matt-mead",
+      "type": "character",
+      "canonical_name": "Matt Mead",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "id": "char-ethan-ralph",
+      "type": "character",
+      "canonical_name": "Ethan Ralph",
+      "description": "",
+      "enabled": true
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "../schemas/reddit-watchlist.schema.json",
+  "subreddits": [
+    {
+      "name": "placeholder_primary_sub",
+      "category": "primary",
+      "weight": 1.0,
+      "enabled": true
+    },
+    {
+      "name": "placeholder_drama_sub",
+      "category": "adjacent",
+      "weight": 0.7,
+      "enabled": true
+    }
+  ],
+  "keywords": [
+    "dabbleverse",
+    "stuttering john",
+    "hackverse"
+  ],
+  "search_config": {
+    "time_filter": "week",
+    "sort": "relevance",
+    "limit": 100
+  }
+}

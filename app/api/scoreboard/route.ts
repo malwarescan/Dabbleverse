@@ -1,0 +1,67 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getCache, setCache } from '@/lib/utils/redis';
+import { getScoreboardRows } from '@/lib/utils/queries';
+import { WindowType, ScoreboardResponse } from '@/lib/types';
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const window = (searchParams.get('window') || 'now') as WindowType;
+    const type = searchParams.get('type') || 'all';
+
+    // Validate window
+    if (!['now', '24h', '7d'].includes(window)) {
+      return NextResponse.json(
+        { error: 'Invalid window parameter' },
+        { status: 400 }
+      );
+    }
+
+    // Cache key
+    const cacheKey = `scoreboard:${window}:${type}`;
+
+    // Try cache first
+    const cached = await getCache<ScoreboardResponse>(cacheKey);
+    if (cached) {
+      return NextResponse.json(cached, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+        },
+      });
+    }
+
+    // ✅ REAL DATA - No more mock!
+    const rows = await getScoreboardRows(window, 50);
+    
+    const response: ScoreboardResponse = {
+      computedAt: new Date().toISOString(),
+      window,
+      rows,
+    };
+    
+    // Fallback to empty if no data yet
+    if (rows.length === 0) {
+      console.warn(`No scoreboard rows found for window: ${window}`);
+    }
+
+    // Filter by type if specified
+    if (type !== 'all') {
+      response.rows = response.rows.filter((row) => row.type === type);
+    }
+
+    // Cache for 30 seconds
+    await setCache(cacheKey, response, { ttl: 30 });
+
+    return NextResponse.json(response, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+      },
+    });
+  } catch (error) {
+    console.error('Scoreboard API error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
