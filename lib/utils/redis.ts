@@ -1,19 +1,42 @@
 import Redis from 'ioredis';
 
-// Create Redis client
-const redis = process.env.REDIS_URL
-  ? new Redis(process.env.REDIS_URL)
-  : null;
+// Lazy-load Redis client (only create when actually used, not during build)
+let redis: Redis | null = null;
+
+function getRedisClient(): Redis | null {
+  // Don't connect during Next.js build
+  if (typeof window === 'undefined' && !process.env.REDIS_URL) {
+    return null;
+  }
+  
+  // Only create connection once
+  if (!redis && process.env.REDIS_URL) {
+    redis = new Redis(process.env.REDIS_URL, {
+      maxRetriesPerRequest: null,
+      lazyConnect: true, // Don't connect immediately
+    });
+    
+    // Suppress connection errors during build
+    redis.on('error', (err) => {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('Redis connection warning:', err.message);
+      }
+    });
+  }
+  
+  return redis;
+}
 
 export interface CacheOptions {
   ttl?: number; // Time to live in seconds
 }
 
 export async function getCache<T>(key: string): Promise<T | null> {
-  if (!redis) return null;
+  const client = getRedisClient();
+  if (!client) return null;
 
   try {
-    const cached = await redis.get(key);
+    const cached = await client.get(key);
     if (!cached) return null;
     return JSON.parse(cached) as T;
   } catch (error) {
@@ -27,14 +50,15 @@ export async function setCache(
   value: any,
   options: CacheOptions = {}
 ): Promise<void> {
-  if (!redis) return;
+  const client = getRedisClient();
+  if (!client) return;
 
   try {
     const serialized = JSON.stringify(value);
     if (options.ttl) {
-      await redis.setex(key, options.ttl, serialized);
+      await client.setex(key, options.ttl, serialized);
     } else {
-      await redis.set(key, serialized);
+      await client.set(key, serialized);
     }
   } catch (error) {
     console.error('Redis set error:', error);
@@ -42,19 +66,21 @@ export async function setCache(
 }
 
 export async function invalidateCache(pattern: string): Promise<void> {
-  if (!redis) return;
+  const client = getRedisClient();
+  if (!client) return;
 
   try {
-    const keys = await redis.keys(pattern);
+    const keys = await client.keys(pattern);
     if (keys.length > 0) {
-      await redis.del(...keys);
+      await client.del(...keys);
     }
   } catch (error) {
     console.error('Redis invalidate error:', error);
   }
 }
 
-export { redis };
+// Export getter instead of direct instance (for compatibility)
+export { getRedisClient as redis };
 
 // Export for BullMQ (requires connection config with maxRetriesPerRequest: null)
 export const redisConnection = {
