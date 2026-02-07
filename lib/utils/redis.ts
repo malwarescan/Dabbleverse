@@ -79,8 +79,8 @@ export async function invalidateCache(pattern: string): Promise<void> {
   }
 }
 
-// Export getter instead of direct instance (for compatibility)
-export { getRedisClient as redis };
+// Export both the getter function and connection config
+export { getRedisClient };
 
 // Export for BullMQ (requires connection config with maxRetriesPerRequest: null)
 export const redisConnection = {

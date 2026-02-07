@@ -1,17 +1,17 @@
 import { Queue, Worker, Job } from 'bullmq';
-import { redis } from '@/lib/utils/redis';
+import { redisConnection } from '@/lib/utils/redis';
 
-// Job queues
-export const ingestionQueue = redis
-  ? new Queue('ingestion', { connection: redis })
+// Job queues (use redisConnection config for BullMQ, not the client instance)
+export const ingestionQueue = process.env.REDIS_URL
+  ? new Queue('ingestion', { connection: redisConnection })
   : null;
 
-export const scoringQueue = redis
-  ? new Queue('scoring', { connection: redis })
+export const scoringQueue = process.env.REDIS_URL
+  ? new Queue('scoring', { connection: redisConnection })
   : null;
 
-export const deduplicationQueue = redis
-  ? new Queue('deduplication', { connection: redis })
+export const deduplicationQueue = process.env.REDIS_URL
+  ? new Queue('deduplication', { connection: redisConnection })
   : null;
 
 // Job types
