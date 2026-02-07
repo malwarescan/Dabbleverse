@@ -27,14 +27,26 @@ export async function getScoreboardRows(
       .innerJoin(entities, eq(scores.entityId, entities.id))
       .where(eq(scores.window, window))
       .orderBy(desc(scores.computedAt), scores.rank)
-      .limit(limit);
+      .limit(limit * 2); // Fetch more to handle potential duplicates
 
     if (latestScores.length === 0) {
       return [];
     }
 
+    // Deduplicate by entityId (most recent wins)
+    const uniqueScores = new Map<string, typeof latestScores[0]>();
+    
+    for (const score of latestScores) {
+      if (!uniqueScores.has(score.entityId)) {
+        uniqueScores.set(score.entityId, score);
+      }
+    }
+
+    // Take only requested limit after deduplication
+    const deduped = Array.from(uniqueScores.values()).slice(0, limit);
+
     // Transform to ScoreboardRow format
-    return latestScores.map((score) => ({
+    return deduped.map((score) => ({
       rank: score.rank,
       deltaRank: score.deltaRank,
       entityId: score.entityId,
@@ -75,14 +87,23 @@ export async function getMovers(
       .innerJoin(entities, eq(scores.entityId, entities.id))
       .where(eq(scores.window, window))
       .orderBy(desc(scores.computedAt))
-      .limit(100); // Get more to sort by momentum
+      .limit(100); // Get more to handle potential duplicates
 
     if (topMovers.length === 0) {
       return [];
     }
 
+    // Deduplicate by entityId (most recent computedAt wins, already sorted)
+    const uniqueMovers = new Map<string, typeof topMovers[0]>();
+    
+    for (const mover of topMovers) {
+      if (!uniqueMovers.has(mover.entityId)) {
+        uniqueMovers.set(mover.entityId, mover);
+      }
+    }
+
     // Sort by absolute momentum and take top movers
-    const sorted = topMovers
+    const sorted = Array.from(uniqueMovers.values())
       .sort((a, b) => Math.abs(parseFloat(b.momentum.toString())) - Math.abs(parseFloat(a.momentum.toString())))
       .slice(0, limit);
 
@@ -112,9 +133,22 @@ export async function getFeedCards(
       .from(feedCards)
       .where(eq(feedCards.window, window))
       .orderBy(desc(feedCards.computedAt))
-      .limit(limit);
+      .limit(limit * 2); // Fetch more to handle potential duplicates
 
-    return cards.map((card) => {
+    // Deduplicate by eventId (most recent computedAt wins)
+    const uniqueCards = new Map<string, typeof cards[0]>();
+    
+    for (const card of cards) {
+      const key = card.eventId;
+      if (!uniqueCards.has(key)) {
+        uniqueCards.set(key, card);
+      }
+    }
+
+    // Take only requested limit after deduplication
+    const deduped = Array.from(uniqueCards.values()).slice(0, limit);
+
+    return deduped.map((card) => {
       // Parse meta if it's a string
       let meta;
       try {

@@ -63,7 +63,7 @@ function CategoryCard({ title, rows, type, icon }: CategoryCardProps) {
         <div className="space-y-2">
           {topTen.map((row) => (
             <div
-              key={row.entityId}
+              key={`category-${type}-${row.entityId}`}
               className="flex items-center justify-between p-3 rounded transition-colors cursor-pointer"
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-broadcast-panel-hover)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}

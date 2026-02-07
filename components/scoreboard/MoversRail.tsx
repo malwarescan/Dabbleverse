@@ -23,9 +23,9 @@ export function MoversRail({ movers }: MoversRailProps) {
   const rising = movers.filter(m => m.momentum > 0).sort((a, b) => b.momentum - a.momentum);
   const falling = movers.filter(m => m.momentum < 0).sort((a, b) => a.momentum - b.momentum);
 
-  const renderMover = (mover: MoverCard) => (
+  const renderMover = (mover: MoverCard, section: 'rising' | 'falling') => (
     <div
-      key={mover.entityId}
+      key={`mover-${section}-${mover.entityId}`}
       className="p-3 rounded transition-colors duration-150 cursor-pointer"
       style={{
         backgroundColor: 'transparent',
@@ -88,7 +88,7 @@ export function MoversRail({ movers }: MoversRailProps) {
           </p>
         ) : (
           <div className="space-y-2">
-            {rising.slice(0, 5).map(renderMover)}
+            {rising.slice(0, 5).map(m => renderMover(m, 'rising'))}
           </div>
         )}
       </div>
@@ -111,7 +111,7 @@ export function MoversRail({ movers }: MoversRailProps) {
           </h2>
 
           <div className="space-y-2">
-            {falling.slice(0, 5).map(renderMover)}
+            {falling.slice(0, 5).map(m => renderMover(m, 'falling'))}
           </div>
         </div>
       )}

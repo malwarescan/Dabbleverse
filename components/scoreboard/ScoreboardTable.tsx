@@ -31,7 +31,7 @@ export function ScoreboardTable({ rows, onRowClick }: ScoreboardTableProps) {
       <div className="md:hidden space-y-3">
         {rows.map((row) => (
           <button
-            key={row.entityId}
+            key={`scoreboard-${row.entityId}`}
             onClick={() => onRowClick?.(row)}
             className="w-full text-left p-4 rounded transition-all duration-200"
             style={{
@@ -116,7 +116,7 @@ export function ScoreboardTable({ rows, onRowClick }: ScoreboardTableProps) {
         <div>
           {rows.map((row, index) => (
             <button
-              key={row.entityId}
+              key={`scoreboard-desktop-${row.entityId}`}
               onClick={() => onRowClick?.(row)}
               className="w-full text-left transition-colors duration-100 border-b last:border-0"
               style={{
