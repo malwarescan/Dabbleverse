@@ -26,7 +26,7 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
             <img 
               src="/dabbleverse-logo.png" 
               alt="Dabbleverse" 
-              className="h-10 md:h-12 w-auto flex-shrink-0"
+              className="h-12 sm:h-14 md:h-16 lg:h-20 w-auto flex-shrink-0"
               style={{
                 filter: 'drop-shadow(0 0 10px rgba(230, 57, 70, 0.4))'
               }}
