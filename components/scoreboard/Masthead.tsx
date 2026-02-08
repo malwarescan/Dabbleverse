@@ -19,15 +19,15 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.6)'
       }}
     >
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        {/* 3-column layout for 640px+ screens */}
-        <div className="hidden sm:grid sm:grid-cols-3 gap-4 items-center">
+      <div className="max-w-7xl mx-auto px-4 py-3">
+        {/* SINGLE responsive layout - works on ALL screen sizes */}
+        <div className="grid grid-cols-[auto_1fr_auto] gap-2 items-center">
           {/* Left: Logo */}
           <div className="flex justify-start">
             <img 
               src="/dabbleverse-logo.png" 
               alt="Dabbleverse" 
-              className="h-14 lg:h-20 w-auto object-contain"
+              className="h-10 sm:h-12 md:h-16 lg:h-20 w-auto object-contain"
               style={{
                 filter: 'drop-shadow(0 0 20px rgba(230, 57, 70, 0.5))'
               }}
@@ -35,9 +35,9 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
           </div>
 
           {/* Center: Tagline */}
-          <div className="flex justify-center">
+          <div className="flex justify-center px-2">
             <span 
-              className="text-sm lg:text-lg font-bold whitespace-nowrap" 
+              className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-center" 
               style={{ 
                 color: 'var(--color-text-secondary)',
                 textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
@@ -48,10 +48,10 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
           </div>
 
           {/* Right: Controls */}
-          <div className="flex justify-end items-center gap-2">
+          <div className="flex justify-end items-center">
             {/* Time Window Selector */}
             <div 
-              className="flex items-center gap-1 rounded-lg p-1" 
+              className="flex items-center gap-0.5 sm:gap-1 rounded-lg p-0.5 sm:p-1" 
               style={{ backgroundColor: 'var(--color-broadcast-surface)' }}
             >
               {TIME_RANGES.map((range) => {
@@ -60,7 +60,7 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
                   <button
                     key={range.value}
                     onClick={() => onWindowChange(range.value)}
-                    className="relative px-5 py-2.5 rounded-md text-sm font-bold transition-all duration-200 min-w-[60px]"
+                    className="relative px-2 sm:px-3 md:px-4 lg:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-md text-xs sm:text-sm font-bold transition-all duration-200"
                     style={
                       isActive
                         ? {
@@ -93,83 +93,6 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
               })}
             </div>
 
-            {/* Status Indicator */}
-            {lastUpdate && (
-              <div className="flex items-center gap-2.5 px-3 py-2 rounded-md" style={{ backgroundColor: 'var(--color-broadcast-surface)' }}>
-                <div 
-                  className="w-2 h-2 rounded-full animate-pulse" 
-                  style={{ 
-                    backgroundColor: 'var(--color-momentum-up)',
-                    boxShadow: '0 0 8px var(--color-momentum-up)'
-                  }}
-                />
-                <span className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--color-text-tertiary)' }}>
-                  LIVE • {new Date(lastUpdate).toLocaleTimeString('en-US', { 
-                    hour: 'numeric', 
-                    minute: '2-digit',
-                    hour12: true 
-                  })}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Mobile only: Stacked layout */}
-        <div className="sm:hidden">
-          {/* Logo centered */}
-          <div className="flex justify-center mb-3">
-            <img 
-              src="/dabbleverse-logo.png" 
-              alt="Dabbleverse" 
-              className="h-12 sm:h-14 w-auto object-contain"
-              style={{
-                filter: 'drop-shadow(0 0 20px rgba(230, 57, 70, 0.5))'
-              }}
-            />
-          </div>
-          
-          {/* Controls centered */}
-          <div className="flex justify-center items-center gap-3">
-            <div 
-              className="flex items-center gap-0.5 rounded-lg p-0.5" 
-              style={{ backgroundColor: 'var(--color-broadcast-surface)' }}
-            >
-              {TIME_RANGES.map((range) => {
-                const isActive = currentWindow === range.value;
-                return (
-                  <button
-                    key={range.value}
-                    onClick={() => onWindowChange(range.value)}
-                    className="relative px-3 py-2 rounded-md text-xs font-bold transition-all duration-200 min-w-[50px]"
-                    style={
-                      isActive
-                        ? {
-                            backgroundColor: 'var(--color-broadcast-accent)',
-                            color: 'white',
-                            boxShadow: '0 0 20px rgba(230, 57, 70, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3)',
-                          }
-                        : {
-                            backgroundColor: 'transparent',
-                            color: 'var(--color-text-tertiary)',
-                          }
-                    }
-                  >
-                    {range.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          
-          {/* Tagline centered */}
-          <div className="text-center mt-2">
-            <span 
-              className="text-xs font-medium" 
-              style={{ color: 'var(--color-text-secondary)' }}
-            >
-              Unbiased Real-Time Analytics
-            </span>
           </div>
         </div>
       </div>
