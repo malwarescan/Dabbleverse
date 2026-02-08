@@ -19,37 +19,33 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.6)'
       }}
     >
-      <div className="max-w-7xl mx-auto px-6 py-4 relative">
-        <div className="flex items-center justify-center gap-8">
-          {/* Center: Brand */}
-          <div className="flex items-center justify-center min-w-0 flex-shrink-0">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3">
+        {/* Desktop: Horizontal layout */}
+        <div className="hidden lg:flex items-center justify-between gap-8">
+          {/* Left: Logo + Tagline */}
+          <div className="flex items-center gap-4">
             <img 
               src="/dabbleverse-logo.png" 
               alt="Dabbleverse" 
-              className="w-64 sm:w-80 md:w-96 lg:w-[500px] h-auto object-contain"
+              className="h-16 w-auto object-contain"
               style={{
                 filter: 'drop-shadow(0 0 20px rgba(230, 57, 70, 0.5))'
               }}
             />
-            
-            <div 
-              className="hidden lg:block w-px h-10 flex-shrink-0" 
-              style={{ backgroundColor: 'var(--color-broadcast-border)' }} 
-            />
-            
+            <div className="w-px h-12" style={{ backgroundColor: 'var(--color-broadcast-border)' }} />
             <span 
-              className="hidden lg:block text-base font-medium whitespace-nowrap" 
+              className="text-base font-medium whitespace-nowrap" 
               style={{ color: 'var(--color-text-secondary)' }}
             >
               Unbiased Real-Time Analytics
             </span>
           </div>
 
-          {/* Right: Controls - Absolute positioned */}
-          <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-3 md:gap-6 flex-shrink-0">
+          {/* Right: Controls */}
+          <div className="flex items-center gap-4">
             {/* Time Window Selector */}
             <div 
-              className="flex items-center gap-0.5 md:gap-1 rounded-lg p-0.5 md:p-1" 
+              className="flex items-center gap-1 rounded-lg p-1" 
               style={{ backgroundColor: 'var(--color-broadcast-surface)' }}
             >
               {TIME_RANGES.map((range) => {
@@ -58,7 +54,7 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
                   <button
                     key={range.value}
                     onClick={() => onWindowChange(range.value)}
-                    className="relative px-3 md:px-5 py-1.5 md:py-2.5 rounded-md text-xs md:text-sm font-bold transition-all duration-200 min-w-[50px] md:min-w-[60px]"
+                    className="relative px-5 py-2.5 rounded-md text-sm font-bold transition-all duration-200 min-w-[60px]"
                     style={
                       isActive
                         ? {
@@ -93,9 +89,9 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
 
             {/* Status Indicator */}
             {lastUpdate && (
-              <div className="hidden lg:flex items-center gap-2.5 px-3 py-2 rounded-md" style={{ backgroundColor: 'var(--color-broadcast-surface)' }}>
+              <div className="flex items-center gap-2.5 px-3 py-2 rounded-md" style={{ backgroundColor: 'var(--color-broadcast-surface)' }}>
                 <div 
-                  className="w-2 h-2 rounded-full animate-pulse flex-shrink-0" 
+                  className="w-2 h-2 rounded-full animate-pulse" 
                   style={{ 
                     backgroundColor: 'var(--color-momentum-up)',
                     boxShadow: '0 0 8px var(--color-momentum-up)'
@@ -113,14 +109,62 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
           </div>
         </div>
 
-        {/* Mobile subtitle */}
-        <div className="lg:hidden mt-2 text-center">
-          <span 
-            className="text-xs md:text-sm font-medium" 
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
-            Unbiased Real-Time Analytics
-          </span>
+        {/* Mobile/Tablet: Stacked layout */}
+        <div className="lg:hidden">
+          {/* Logo centered */}
+          <div className="flex justify-center mb-3">
+            <img 
+              src="/dabbleverse-logo.png" 
+              alt="Dabbleverse" 
+              className="h-12 sm:h-14 w-auto object-contain"
+              style={{
+                filter: 'drop-shadow(0 0 20px rgba(230, 57, 70, 0.5))'
+              }}
+            />
+          </div>
+          
+          {/* Controls centered */}
+          <div className="flex justify-center items-center gap-3">
+            <div 
+              className="flex items-center gap-0.5 rounded-lg p-0.5" 
+              style={{ backgroundColor: 'var(--color-broadcast-surface)' }}
+            >
+              {TIME_RANGES.map((range) => {
+                const isActive = currentWindow === range.value;
+                return (
+                  <button
+                    key={range.value}
+                    onClick={() => onWindowChange(range.value)}
+                    className="relative px-3 py-2 rounded-md text-xs font-bold transition-all duration-200 min-w-[50px]"
+                    style={
+                      isActive
+                        ? {
+                            backgroundColor: 'var(--color-broadcast-accent)',
+                            color: 'white',
+                            boxShadow: '0 0 20px rgba(230, 57, 70, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3)',
+                          }
+                        : {
+                            backgroundColor: 'transparent',
+                            color: 'var(--color-text-tertiary)',
+                          }
+                    }
+                  >
+                    {range.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          
+          {/* Tagline centered */}
+          <div className="text-center mt-2">
+            <span 
+              className="text-xs font-medium" 
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              Unbiased Real-Time Analytics
+            </span>
+          </div>
         </div>
       </div>
     </div>
