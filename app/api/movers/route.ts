@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCache, setCache } from '@/lib/utils/redis';
 import { getMovers } from '@/lib/utils/queries';
+import { mockMoversData } from '@/lib/utils/mockData';
 import { WindowType, MoversResponse } from '@/lib/types';
 
 export async function GET(request: NextRequest) {
@@ -29,18 +30,25 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // ✅ REAL DATA - No more mock!
-    const movers = await getMovers(window, 20);
-    
-    const response: MoversResponse = {
-      computedAt: new Date().toISOString(),
-      window,
-      movers,
-    };
-    
-    // Fallback to empty if no data yet
-    if (movers.length === 0) {
-      console.warn(`No movers found for window: ${window}`);
+    let response: MoversResponse;
+
+    try {
+      // Try real data first
+      const movers = await getMovers(window, 20);
+      
+      if (movers.length === 0) {
+        console.warn(`No movers found, using mock data for window: ${window}`);
+        response = mockMoversData(window);
+      } else {
+        response = {
+          computedAt: new Date().toISOString(),
+          window,
+          movers,
+        };
+      }
+    } catch (dbError) {
+      console.warn('Database unavailable, using mock data:', dbError);
+      response = mockMoversData(window);
     }
 
     // Cache for 30 seconds

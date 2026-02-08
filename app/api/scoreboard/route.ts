@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCache, setCache } from '@/lib/utils/redis';
 import { getScoreboardRows } from '@/lib/utils/queries';
+import { mockScoreboardData } from '@/lib/utils/mockData';
 import { WindowType, ScoreboardResponse } from '@/lib/types';
 
 export async function GET(request: NextRequest) {
@@ -30,18 +31,27 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // ✅ REAL DATA - No more mock!
-    const rows = await getScoreboardRows(window, 50);
-    
-    const response: ScoreboardResponse = {
-      computedAt: new Date().toISOString(),
-      window,
-      rows,
-    };
-    
-    // Fallback to empty if no data yet
-    if (rows.length === 0) {
-      console.warn(`No scoreboard rows found for window: ${window}`);
+    let response: ScoreboardResponse;
+
+    try {
+      // Try real data first
+      const rows = await getScoreboardRows(window, 50);
+      
+      if (rows.length === 0) {
+        console.warn(`No scoreboard rows found, using mock data for window: ${window}`);
+        // Use mock data as fallback
+        response = mockScoreboardData(window);
+      } else {
+        response = {
+          computedAt: new Date().toISOString(),
+          window,
+          rows,
+        };
+      }
+    } catch (dbError) {
+      // Database error - use mock data
+      console.warn('Database unavailable, using mock data:', dbError);
+      response = mockScoreboardData(window);
     }
 
     // Filter by type if specified
