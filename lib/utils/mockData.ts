@@ -175,7 +175,7 @@ export function generateMockFeed(window: WindowType): FeedResponse {
     why: `This ${i % 2 === 0 ? 'clip' : 'thread'} sparked ${
       Math.floor(Math.random() * 500) + 100
     } reactions across platforms`,
-    url: `https://example.com/mock-${i}`,
+    url: '#', // Mock card – no real link until feed_cards are populated
     eventId: `event-${i}`,
     entityIds: [REAL_ENTITIES[Math.floor(Math.random() * REAL_ENTITIES.length)].id],
   }));

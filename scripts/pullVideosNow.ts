@@ -28,6 +28,14 @@ async function pullVideos() {
     });
     console.log(`   ✅ Job added with ID: ${job2.id}\n`);
     
+    // Trigger main tier (character channels – for breaking story detection)
+    console.log('3️⃣ Triggering pull_uploads for MAIN tier...');
+    const job3 = await youtubeQueue.add('pull_uploads', { tier: 'main' }, {
+      removeOnComplete: false,
+      removeOnFail: false,
+    });
+    console.log(`   ✅ Job added with ID: ${job3.id}\n`);
+    
     console.log('⏳ Jobs queued! Check worker logs for progress...');
     console.log('   (This may take 30-60 seconds to complete)\n');
     

@@ -39,6 +39,10 @@ const storylines = [
     name: "MLC vs Everyone", 
     aliases: ["mlc", "misery loves company", "mlc podcast"] 
   },
+  { 
+    name: "MAMI Done With RAY", 
+    aliases: ["mami done with ray", "mami ray", "mami and ray", "mami vs ray", "mami"] 
+  },
 ];
 
 async function update() {

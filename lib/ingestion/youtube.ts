@@ -63,6 +63,36 @@ export async function fetchVideoCommentSnippets(
 }
 
 /**
+ * Fetch a single video by ID (title, description, stats). Used for one-off ingests.
+ */
+export async function fetchVideoById(videoId: string): Promise<YouTubeVideoData | null> {
+  try {
+    const res = await youtube.videos.list({
+      part: ['snippet', 'statistics', 'contentDetails'],
+      id: [videoId],
+    });
+    const video = res.data.items?.[0];
+    if (!video) return null;
+    const snippet = video.snippet!;
+    const stats = video.statistics || {};
+    return {
+      id: video.id!,
+      title: snippet.title || '',
+      channel: snippet.channelTitle || '',
+      channelId: snippet.channelId || '',
+      publishedAt: snippet.publishedAt || '',
+      views: parseInt(stats.viewCount || '0'),
+      likes: parseInt(stats.likeCount || '0'),
+      comments: parseInt(stats.commentCount || '0'),
+      url: `https://www.youtube.com/watch?v=${video.id}`,
+    };
+  } catch (err) {
+    console.error(`Error fetching video ${videoId}:`, err);
+    return null;
+  }
+}
+
+/**
  * Fetch videos from a specific channel
  */
 export async function fetchChannelVideos(

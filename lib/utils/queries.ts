@@ -1,5 +1,5 @@
-import { db, scores, feedCards, entities } from '@/lib/db';
-import { eq, desc, and } from 'drizzle-orm';
+import { db, scores, feedCards, entities, items } from '@/lib/db';
+import { eq, desc, and, gt } from 'drizzle-orm';
 import { WindowType, ScoreboardRow, MoverCard, FeedCardData } from '@/lib/types';
 
 export async function getScoreboardRows(
@@ -175,6 +175,48 @@ export async function getFeedCards(
     });
   } catch (error) {
     console.error('Error fetching feed cards:', error);
+    return [];
+  }
+}
+
+/** Fallback: build feed cards from recent items (real URLs) when feed_cards table is empty */
+export async function getFeedCardsFromRecentItems(
+  limit: number = 50
+): Promise<FeedCardData[]> {
+  try {
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // last 7 days
+    const rows = await db
+      .select({
+        id: items.id,
+        url: items.url,
+        title: items.title,
+        author: items.author,
+        channelTitle: items.channelTitle,
+        publishedAt: items.publishedAt,
+        platform: items.platform,
+      })
+      .from(items)
+      .where(gt(items.publishedAt, since))
+      .orderBy(desc(items.publishedAt))
+      .limit(limit);
+
+    return rows.map((row) => ({
+      id: String(row.id),
+      source: row.platform as 'youtube' | 'reddit' | 'x',
+      title: row.title || 'Untitled',
+      meta: {
+        author: row.author ?? undefined,
+        channel: row.channelTitle ?? undefined,
+        timestamp: row.publishedAt.toISOString(),
+        platform: row.platform as 'youtube' | 'reddit' | 'x',
+      },
+      why: 'Recent clip or post from the feed.',
+      url: row.url,
+      eventId: String(row.id),
+      entityIds: [],
+    }));
+  } catch (error) {
+    console.error('Error fetching feed from items:', error);
     return [];
   }
 }

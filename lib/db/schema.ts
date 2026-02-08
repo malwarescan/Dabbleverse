@@ -5,7 +5,7 @@ export const entityTypeEnum = pgEnum('entity_type', ['character', 'storyline', '
 export const platformEnum = pgEnum('platform', ['youtube', 'reddit', 'x']);
 export const windowEnum = pgEnum('window', ['now', '24h', '7d']);
 export const matchTypeEnum = pgEnum('match_type', ['exact', 'contains', 'regex', 'handle']);
-export const tierEnum = pgEnum('tier', ['clippers', 'weekly_wrap']);
+export const tierEnum = pgEnum('tier', ['clippers', 'weekly_wrap', 'main']);
 export const driverLabelEnum = pgEnum('driver_label', [
   'clip_spike',
   'dunk_thread',

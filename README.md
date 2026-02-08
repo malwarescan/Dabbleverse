@@ -153,14 +153,40 @@ http://localhost:3000
 
 Edit these JSON files to configure the system:
 
-- `seed/watchlists/youtube.json` - YouTube channels to monitor
+- `seed/watchlists/youtube.json` - YouTube channels to monitor (tiers: **clippers**, **weekly_wrap**, **main**)
 - `seed/watchlists/reddit.json` - Subreddits to monitor
 - `seed/entities/entities.json` - Characters, Storylines, Shows
 - `seed/entities/aliases.json` - Matching patterns per entity
 
+**Tiers:**
+- **clippers** – Clip channels (ingested every 10 min); drive scoreboard and feed.
+- **weekly_wrap** – Recap channels (every 30 min).
+- **main** – Main character channels (every 15 min). Their **video titles, descriptions, and live stream summaries** are ingested and analyzed for **breaking stories** (with comments from all tiers).
+
 After editing, run:
 ```bash
 npm run seed
+npm run seed:youtube   # Or just YouTube watchlist
+```
+
+### Breaking stories pipeline
+
+Every new upload (clippers, weekly_wrap, main) is:
+
+1. **Ingested** – Title and description (including live stream summaries) stored in `items`.
+2. **Comments** – For the last 48h / 50 most recent videos, comments are pulled and stored in `youtube_comment_snippets`.
+3. **Budding detection** – `detect_budding_stories` (every 20 min) scans **comment text** and **video titles + descriptions** (including main-channel streams) and counts mentions of storylines/characters/shows; results go to `budding_storyline_signals` and feed/UI.
+
+To ingest a **single video** (e.g. a clipper upload you want in the system immediately):
+
+```bash
+npx tsx scripts/ingestOneVideo.ts <videoId> "https://www.youtube.com/@ChannelHandle"
+```
+
+If the `youtube_comment_snippets` or `budding_storyline_signals` tables are missing (e.g. after a fresh DB), run once:
+
+```bash
+npx tsx scripts/ensureBuddingTables.ts
 ```
 
 ## 🚢 Deployment

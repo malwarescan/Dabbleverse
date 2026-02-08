@@ -60,7 +60,7 @@ export async function detectBuddingStories(job: Job) {
     .where(gt(youtubeCommentSnippets.publishedAt, new Date(Date.now() - hours * 60 * 60 * 1000)))
     .orderBy(desc(youtubeCommentSnippets.publishedAt));
 
-  // 3. Recent video titles + descriptions (items.content)
+  // 3. Recent video titles + descriptions (items.content) — includes live stream summaries (same field from YouTube API)
   const since = new Date(Date.now() - hours * 60 * 60 * 1000);
   const itemRows = await db
     .select({

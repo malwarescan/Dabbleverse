@@ -28,7 +28,7 @@ export async function pullComments(job: Job) {
   });
   
   try {
-    // Get recent videos from last 24 hours
+    // Get recent videos from last 48 hours so every new upload gets comments pulled for breaking-story analysis
     const recentItems = await db
       .select({
         id: items.id,
@@ -39,11 +39,11 @@ export async function pullComments(job: Job) {
       .from(items)
       .where(
         sql`${items.platform} = 'youtube' 
-            AND ${items.publishedAt} > NOW() - INTERVAL '24 hours'`
+            AND ${items.publishedAt} > NOW() - INTERVAL '48 hours'`
       )
       .orderBy(desc(items.publishedAt))
-      .limit(20); // Analyze top 20 recent videos
-    
+      .limit(50); // Cover more new uploads (clippers + main + weekly_wrap)
+
     console.log(`  Found ${recentItems.length} recent videos to analyze`);
     
     const chatterStats = new Map<string, {

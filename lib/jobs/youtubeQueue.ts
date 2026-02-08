@@ -41,6 +41,15 @@ export async function scheduleYouTubeJobs() {
       removeOnFail: false,
     });
     console.log('  ✅ Scheduled: pull_uploads_weekly (every 30 min)');
+
+    // 3b. Pull uploads - main (character) tier: titles, descriptions, live stream summaries for breaking stories
+    await youtubeQueue.add('pull_uploads', { tier: 'main' }, {
+      repeat: { pattern: '*/15 * * * *' }, // Every 15 min
+      jobId: 'pull_uploads_main',
+      removeOnComplete: 10,
+      removeOnFail: false,
+    });
+    console.log('  ✅ Scheduled: pull_uploads_main (every 15 min)');
     
     // 4. Refresh stats (every 15 minutes)
     await youtubeQueue.add('refresh_stats', {}, {

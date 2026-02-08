@@ -27,6 +27,10 @@ async function trigger() {
     console.log('3️⃣ Triggering: pull_uploads (weekly_wrap)');
     await triggerJob('pull_uploads', { tier: 'weekly_wrap' });
     
+    // 3b. Pull uploads for main (character channels – titles/descriptions for breaking stories)
+    console.log('3b. Triggering: pull_uploads (main)');
+    await triggerJob('pull_uploads', { tier: 'main' });
+    
     // Wait for uploads to complete
     await new Promise(resolve => setTimeout(resolve, 30000));
     

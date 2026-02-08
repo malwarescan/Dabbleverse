@@ -44,6 +44,8 @@ export async function buildFeedCards(job: Job) {
         }
       } else if (primaryItem.tier === 'weekly_wrap') {
         why = 'Weekly recap consolidating the storyline.';
+      } else if (primaryItem.tier === 'main') {
+        why = 'Main character channel: title or stream summary signals breaking story.';
       } else {
         why = 'Community activity detected.';
       }

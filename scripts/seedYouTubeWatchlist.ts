@@ -37,7 +37,7 @@ async function seedWatchlist() {
         await db.insert(sourceAccounts)
           .values({
             platform: 'youtube',
-            tier: tier as 'clippers' | 'weekly_wrap',
+            tier: tier as 'clippers' | 'weekly_wrap' | 'main',
             sourceUrl: url,
             handle: handle,
             isActive: true,
@@ -45,7 +45,7 @@ async function seedWatchlist() {
           .onConflictDoUpdate({
             target: [sourceAccounts.sourceUrl],
             set: {
-              tier: tier as 'clippers' | 'weekly_wrap',
+              tier: tier as 'clippers' | 'weekly_wrap' | 'main',
               isActive: true,
               updatedAt: new Date(),
             },
@@ -65,11 +65,13 @@ async function seedWatchlist() {
   // Show summary
   const clippers = await db.select().from(sourceAccounts).where(eq(sourceAccounts.tier, 'clippers'));
   const weekly = await db.select().from(sourceAccounts).where(eq(sourceAccounts.tier, 'weekly_wrap'));
+  const main = await db.select().from(sourceAccounts).where(eq(sourceAccounts.tier, 'main'));
   
   console.log(`\n📊 Summary:`);
   console.log(`  Clippers: ${clippers.length}`);
   console.log(`  Weekly Wrap: ${weekly.length}`);
-  console.log(`  Total: ${clippers.length + weekly.length}`);
+  console.log(`  Main (character channels): ${main.length}`);
+  console.log(`  Total: ${clippers.length + weekly.length + main.length}`);
   
   process.exit(0);
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCache, setCache } from '@/lib/utils/redis';
-import { getFeedCards } from '@/lib/utils/queries';
+import { getFeedCards, getFeedCardsFromRecentItems } from '@/lib/utils/queries';
 import { generateMockFeed } from '@/lib/utils/mockData';
 import { WindowType, FeedResponse } from '@/lib/types';
 
@@ -28,7 +28,10 @@ export async function GET(request: NextRequest) {
 
     if (!response?.cards?.length) {
       try {
-        const cards = await getFeedCards(window, 50);
+        let cards = await getFeedCards(window, 50);
+        if (cards.length === 0) {
+          cards = await getFeedCardsFromRecentItems(50);
+        }
         response = cards.length > 0
           ? { computedAt: new Date().toISOString(), window, cards }
           : generateMockFeed(window);
