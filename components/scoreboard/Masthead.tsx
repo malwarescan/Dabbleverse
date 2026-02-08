@@ -20,14 +20,14 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
       }}
     >
       <div className="max-w-7xl mx-auto px-6 py-4">
-        {/* 3-column layout for medium screens and up */}
-        <div className="hidden md:grid md:grid-cols-3 gap-4 items-center">
+        {/* 3-column layout for 640px+ screens */}
+        <div className="hidden sm:grid sm:grid-cols-3 gap-4 items-center">
           {/* Left: Logo */}
           <div className="flex justify-start">
             <img 
               src="/dabbleverse-logo.png" 
               alt="Dabbleverse" 
-              className="h-16 md:h-20 w-auto object-contain"
+              className="h-14 lg:h-20 w-auto object-contain"
               style={{
                 filter: 'drop-shadow(0 0 20px rgba(230, 57, 70, 0.5))'
               }}
@@ -37,7 +37,7 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
           {/* Center: Tagline */}
           <div className="flex justify-center">
             <span 
-              className="text-base md:text-lg font-bold whitespace-nowrap" 
+              className="text-sm lg:text-lg font-bold whitespace-nowrap" 
               style={{ 
                 color: 'var(--color-text-secondary)',
                 textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
@@ -48,7 +48,7 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
           </div>
 
           {/* Right: Controls */}
-          <div className="flex justify-end items-center gap-2 md:gap-4">
+          <div className="flex justify-end items-center gap-2">
             {/* Time Window Selector */}
             <div 
               className="flex items-center gap-1 rounded-lg p-1" 
@@ -116,7 +116,7 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
         </div>
 
         {/* Mobile only: Stacked layout */}
-        <div className="md:hidden">
+        <div className="sm:hidden">
           {/* Logo centered */}
           <div className="flex justify-center mb-3">
             <img 
