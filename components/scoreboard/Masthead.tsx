@@ -19,30 +19,36 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.6)'
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3">
-        {/* Desktop: Horizontal layout */}
-        <div className="hidden lg:flex items-center justify-between gap-8">
-          {/* Left: Logo + Tagline */}
-          <div className="flex items-center gap-4">
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        {/* Desktop: 3-column layout */}
+        <div className="hidden lg:grid lg:grid-cols-3 gap-4 items-center">
+          {/* Left: Logo */}
+          <div className="flex justify-start">
             <img 
               src="/dabbleverse-logo.png" 
               alt="Dabbleverse" 
-              className="h-16 w-auto object-contain"
+              className="h-20 w-auto object-contain"
               style={{
                 filter: 'drop-shadow(0 0 20px rgba(230, 57, 70, 0.5))'
               }}
             />
-            <div className="w-px h-12" style={{ backgroundColor: 'var(--color-broadcast-border)' }} />
+          </div>
+
+          {/* Center: Tagline */}
+          <div className="flex justify-center">
             <span 
-              className="text-base font-medium whitespace-nowrap" 
-              style={{ color: 'var(--color-text-secondary)' }}
+              className="text-lg font-bold whitespace-nowrap" 
+              style={{ 
+                color: 'var(--color-text-secondary)',
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+              }}
             >
               Unbiased Real-Time Analytics
             </span>
           </div>
 
           {/* Right: Controls */}
-          <div className="flex items-center gap-4">
+          <div className="flex justify-end items-center gap-4">
             {/* Time Window Selector */}
             <div 
               className="flex items-center gap-1 rounded-lg p-1" 
