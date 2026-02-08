@@ -19,6 +19,49 @@ export interface YouTubeVideoData {
   url: string;
 }
 
+/** Single comment snippet for budding-story analysis */
+export interface YouTubeCommentSnippet {
+  youtubeCommentId: string;
+  text: string;
+  authorDisplayName: string;
+  likeCount: number;
+  publishedAt: string;
+}
+
+/**
+ * Fetch comment snippets for a video (text + metadata for analysis).
+ * Used to detect budding stories from comment discussion.
+ */
+export async function fetchVideoCommentSnippets(
+  videoId: string,
+  maxResults: number = 100,
+  order: 'relevance' | 'time' = 'relevance'
+): Promise<YouTubeCommentSnippet[]> {
+  try {
+    const response = await youtube.commentThreads.list({
+      part: ['snippet'],
+      videoId,
+      maxResults,
+      order,
+      textFormat: 'plainText',
+    });
+    const items = response.data.items || [];
+    return items.map((thread) => {
+      const snip = thread.snippet?.topLevelComment?.snippet;
+      return {
+        youtubeCommentId: thread.snippet?.topLevelComment?.id || '',
+        text: snip?.textDisplay || snip?.textOriginal || '',
+        authorDisplayName: snip?.authorDisplayName || 'Unknown',
+        likeCount: snip?.likeCount || 0,
+        publishedAt: snip?.publishedAt || new Date().toISOString(),
+      };
+    }).filter((c) => c.text.length > 0);
+  } catch (err) {
+    console.error(`Error fetching comments for video ${videoId}:`, err);
+    return [];
+  }
+}
+
 /**
  * Fetch videos from a specific channel
  */

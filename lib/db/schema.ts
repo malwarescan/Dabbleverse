@@ -197,6 +197,38 @@ export const feedCards = pgTable('feed_cards', {
   windowEventIdx: uniqueIndex('feed_cards_window_event_idx').on(table.window, table.eventId),
 }));
 
+// YouTube comment snippets (for budding story analysis from comment + video description text)
+export const youtubeCommentSnippets = pgTable('youtube_comment_snippets', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  itemId: uuid('item_id').notNull().references(() => items.id, { onDelete: 'cascade' }),
+  youtubeCommentId: varchar('youtube_comment_id', { length: 255 }).notNull(),
+  text: text('text').notNull(),
+  authorDisplayName: varchar('author_display_name', { length: 255 }),
+  likeCount: integer('like_count').default(0),
+  publishedAt: timestamp('published_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  itemIdIdx: index('youtube_comment_snippets_item_id_idx').on(table.itemId),
+  publishedAtIdx: index('youtube_comment_snippets_published_at_idx').on(table.publishedAt),
+  uniqueItemComment: uniqueIndex('youtube_comment_snippets_unique').on(table.itemId, table.youtubeCommentId),
+}));
+
+// Budding storyline signals (mention counts from comments + video descriptions)
+export const buddingStorylineSignals = pgTable('budding_storyline_signals', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  entityId: uuid('entity_id').notNull().references(() => entities.id, { onDelete: 'cascade' }),
+  window: windowEnum('window').notNull(),
+  mentionCount: integer('mention_count').notNull().default(0),
+  commentMentions: integer('comment_mentions').default(0),
+  descriptionMentions: integer('description_mentions').default(0),
+  sampleSnippets: jsonb('sample_snippets'), // [{ source: 'comment'|'description', text: string }]
+  computedAt: timestamp('computed_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  entityWindowIdx: index('budding_storyline_signals_entity_window_idx').on(table.entityId, table.window),
+  computedAtIdx: index('budding_storyline_signals_computed_at_idx').on(table.computedAt),
+}));
+
 // Watchlists table (configurable channel/sub lists)
 export const watchlists = pgTable('watchlists', {
   id: uuid('id').primaryKey().defaultRandom(),

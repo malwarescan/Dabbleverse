@@ -52,6 +52,24 @@ export async function scheduleYouTubeJobs() {
       removeOnFail: false,
     });
     console.log('  ✅ Scheduled: refresh_stats (every 15 min)');
+
+    // 4b. Pull comments (for chatters + budding-story analysis)
+    await youtubeQueue.add('pull_comments', {}, {
+      repeat: { pattern: '*/30 * * * *' },
+      jobId: 'pull_comments',
+      removeOnComplete: 10,
+      removeOnFail: false,
+    });
+    console.log('  ✅ Scheduled: pull_comments (every 30 min)');
+
+    // 4c. Detect budding stories from comments + video descriptions
+    await youtubeQueue.add('detect_budding_stories', { window: '24h' }, {
+      repeat: { pattern: '*/20 * * * *' },
+      jobId: 'detect_budding_stories_24h',
+      removeOnComplete: 10,
+      removeOnFail: false,
+    });
+    console.log('  ✅ Scheduled: detect_budding_stories (every 20 min)');
     
     // 5. Dedupe events (every 10 minutes)
     await dedupeQueue.add('dedupe_events', {}, {
@@ -98,6 +116,10 @@ export async function triggerJob(jobName: string, data: any = {}) {
       return await dedupeQueue.add('dedupe_events', data);
     case 'build_feed_cards':
       return await feedQueue.add('build_feed_cards', data);
+    case 'pull_comments':
+      return await youtubeQueue.add('pull_comments', data);
+    case 'detect_budding_stories':
+      return await youtubeQueue.add('detect_budding_stories', { window: data.window || '24h' });
     default:
       throw new Error(`Unknown job: ${jobName}`);
   }

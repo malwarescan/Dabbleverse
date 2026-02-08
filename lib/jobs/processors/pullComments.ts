@@ -1,7 +1,7 @@
 import { Job } from 'bullmq';
 import { google } from 'googleapis';
 import { db } from '../../db/index';
-import { items, entities, entityAliases } from '../../db/schema';
+import { items, entities, entityAliases, youtubeCommentSnippets } from '../../db/schema';
 import { eq, desc, sql } from 'drizzle-orm';
 import pg from 'pg';
 
@@ -71,16 +71,33 @@ export async function pullComments(job: Job) {
         const comments = response.data.items || [];
         totalComments += comments.length;
         
-        // Process each comment
+        // Process each comment: aggregate chatters + store text for budding-story analysis
         for (const thread of comments) {
-          const topLevelComment = thread.snippet?.topLevelComment?.snippet;
+          const topLevel = thread.snippet?.topLevelComment;
+          const topLevelComment = topLevel?.snippet;
           if (!topLevelComment) continue;
-          
+
+          const commentId = topLevel?.id || '';
+          const text = (topLevelComment.textDisplay || topLevelComment.textOriginal || '').replace(/<[^>]*>/g, '').trim();
           const authorName = topLevelComment.authorDisplayName || 'Unknown';
           const channelId = topLevelComment.authorChannelId?.value || 'unknown';
           const likeCount = topLevelComment.likeCount || 0;
           const replyCount = thread.snippet?.totalReplyCount || 0;
-          
+
+          // Store snippet for budding story analysis
+          if (text.length > 0 && commentId) {
+            await db.insert(youtubeCommentSnippets)
+              .values({
+                itemId: item.id,
+                youtubeCommentId: commentId,
+                text,
+                authorDisplayName: authorName,
+                likeCount,
+                publishedAt: new Date(topLevelComment.publishedAt!),
+              })
+              .onConflictDoNothing({ target: [youtubeCommentSnippets.itemId, youtubeCommentSnippets.youtubeCommentId] });
+          }
+
           // Aggregate stats per chatter
           if (!chatterStats.has(channelId)) {
             chatterStats.set(channelId, {
@@ -91,7 +108,6 @@ export async function pullComments(job: Job) {
               totalReplies: 0,
             });
           }
-          
           const stats = chatterStats.get(channelId)!;
           stats.commentCount++;
           stats.totalLikes += likeCount;

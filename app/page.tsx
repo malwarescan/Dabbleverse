@@ -8,6 +8,7 @@ import { CategoryCards } from '@/components/scoreboard/CategoryCards';
 import { TickerDock } from '@/components/ticker/TickerDock';
 import {
   WindowType,
+  TIME_RANGES,
   ScoreboardResponse,
   MoversResponse,
   FeedResponse,
@@ -85,9 +86,41 @@ export default function HomePage() {
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 md:gap-6 mb-6 md:mb-8">
               {/* Left: Primary Scoreboard */}
               <div>
-                <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">
-                  Top Characters
-                </h2>
+                <div className="flex items-center justify-between gap-4 mb-3 md:mb-4">
+                  <h2 className="text-xl md:text-2xl font-bold max-w-[196px]">
+                    Cows & Characters
+                  </h2>
+                  {/* Time filter - same row, right-aligned */}
+                  <div
+                    className="flex items-center gap-0.5 sm:gap-1 rounded-lg p-0.5 sm:p-1 shrink-0"
+                    style={{ backgroundColor: 'var(--color-broadcast-surface)' }}
+                  >
+                    {TIME_RANGES.map(({ value, label }) => {
+                      const isActive = currentWindow === value;
+                      return (
+                        <button
+                          key={value}
+                          onClick={() => setCurrentWindow(value)}
+                          className="relative px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-bold transition-all duration-200"
+                          style={
+                            isActive
+                              ? {
+                                  backgroundColor: 'var(--color-broadcast-accent)',
+                                  color: 'white',
+                                  boxShadow: '0 0 20px rgba(230, 57, 70, 0.4)',
+                                }
+                              : {
+                                  backgroundColor: 'transparent',
+                                  color: 'var(--color-text-tertiary)',
+                                }
+                          }
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
                 <ScoreboardTable
                   rows={characters.slice(0, 10) || []}
                   onRowClick={(row) => {

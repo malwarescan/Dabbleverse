@@ -1,99 +1,83 @@
 'use client';
 
-import { WindowType, TIME_RANGES } from '@/lib/types';
+import { useState, useEffect } from 'react';
+import { WindowType } from '@/lib/types';
+
+const SCROLL_THRESHOLD = 100;
 
 interface MastheadProps {
-  currentWindow: WindowType;
-  onWindowChange: (window: WindowType) => void;
+  currentWindow?: WindowType;
+  onWindowChange?: (window: WindowType) => void;
   lastUpdate?: string;
 }
 
-export function Masthead({ currentWindow, onWindowChange, lastUpdate }: MastheadProps) {
+export function Masthead(_props: MastheadProps) {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > SCROLL_THRESHOLD);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div 
-      className="sticky top-0 z-50"
-      style={{
-        backgroundColor: 'rgba(10, 11, 13, 0.98)',
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid var(--color-broadcast-border)',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.6)'
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-4 py-3">
-        {/* SINGLE responsive layout - works on ALL screen sizes */}
-        <div className="grid grid-cols-[auto_1fr_auto] gap-2 items-center">
-          {/* Left: Logo */}
-          <div className="flex justify-start">
-            <img 
-              src="/dabbleverse-logo.png" 
-              alt="Dabbleverse" 
-              className="h-10 sm:h-12 md:h-16 lg:h-20 w-auto object-contain"
-              style={{
-                filter: 'drop-shadow(0 0 20px rgba(230, 57, 70, 0.5))'
-              }}
-            />
-          </div>
+    <div className="sticky top-0 z-50 box-content bg-transparent">
+      <div
+        className="max-w-7xl mx-auto px-4 box-content relative overflow-hidden bg-transparent"
+        style={{
+          paddingTop: isScrolled ? '0.5rem' : '0.75rem',
+          paddingBottom: isScrolled ? '0.5rem' : '0.75rem',
+          transition: 'padding 0.4s ease-out',
+        }}
+      >
+        {/* Full logo: recedes to top and evaporates on scroll down; rolls out from top on scroll up */}
+        <div
+          className="flex justify-center items-center"
+          style={{
+            transform: isScrolled
+              ? 'translateY(-100%) scale(0.7)'
+              : 'translateY(0) scale(1)',
+            opacity: isScrolled ? 0 : 1,
+            pointerEvents: isScrolled ? 'none' : 'auto',
+            transition: 'transform 0.5s ease-out, opacity 0.5s ease-out',
+          }}
+        >
+          <img
+            src="/dabbleverse-logo.png"
+            alt="Dabbleverse"
+            className="h-[120px] sm:h-[132px] md:h-36 lg:h-40 w-auto object-contain transition-all duration-500 ease-out"
+            style={{
+              width: '459px',
+              height: '160px',
+              filter: 'drop-shadow(0 0 20px rgba(230, 57, 70, 0.5))',
+            }}
+          />
+        </div>
 
-          {/* Center: Tagline */}
-          <div className="flex justify-center px-2">
-            <span 
-              className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-center" 
-              style={{ 
-                color: 'var(--color-text-secondary)',
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
-              }}
-            >
-              Unbiased Real-Time Analytics
-            </span>
-          </div>
-
-          {/* Right: Controls */}
-          <div className="flex justify-end items-center">
-            {/* Time Window Selector */}
-            <div 
-              className="flex items-center gap-0.5 sm:gap-1 rounded-lg p-0.5 sm:p-1" 
-              style={{ backgroundColor: 'var(--color-broadcast-surface)' }}
-            >
-              {TIME_RANGES.map((range) => {
-                const isActive = currentWindow === range.value;
-                return (
-                  <button
-                    key={range.value}
-                    onClick={() => onWindowChange(range.value)}
-                    className="relative px-2 sm:px-3 md:px-4 lg:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-md text-xs sm:text-sm font-bold transition-all duration-200"
-                    style={
-                      isActive
-                        ? {
-                            backgroundColor: 'var(--color-broadcast-accent)',
-                            color: 'white',
-                            boxShadow: '0 0 20px rgba(230, 57, 70, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3)',
-                            transform: 'translateY(-1px)'
-                          }
-                        : {
-                            backgroundColor: 'transparent',
-                            color: 'var(--color-text-tertiary)',
-                          }
-                    }
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.color = 'var(--color-text-primary)';
-                        e.currentTarget.style.backgroundColor = 'var(--color-broadcast-panel)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.color = 'var(--color-text-tertiary)';
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }
-                    }}
-                  >
-                    {range.label}
-                  </button>
-                );
-              })}
-            </div>
-
-          </div>
+        {/* D logo: pops up in left corner when scrolled; recedes when near top */}
+        <div
+          className="absolute left-4 top-1/2 -translate-y-1/2 transition-all duration-400 ease-out"
+          style={{
+            opacity: isScrolled ? 1 : 0,
+            transform: isScrolled
+              ? 'translateY(-50%) scale(1)'
+              : 'translateY(-50%) scale(0.85) translateX(-12px)',
+            pointerEvents: isScrolled ? 'auto' : 'none',
+            transition: 'opacity 0.4s ease-out, transform 0.4s ease-out',
+          }}
+          aria-hidden
+        >
+          <img
+            src="/dabbleverse-D-isolated.png"
+            alt=""
+            className="h-7 sm:h-8 md:h-9 w-auto object-contain"
+            style={{
+              filter: 'drop-shadow(0 0 12px rgba(230, 57, 70, 0.4))',
+            }}
+          />
         </div>
       </div>
     </div>

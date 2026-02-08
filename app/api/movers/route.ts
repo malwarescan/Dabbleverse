@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCache, setCache } from '@/lib/utils/redis';
 import { getMovers } from '@/lib/utils/queries';
-import { mockMoversData } from '@/lib/utils/mockData';
+import { generateMockMovers } from '@/lib/utils/mockData';
 import { WindowType, MoversResponse } from '@/lib/types';
 
 export async function GET(request: NextRequest) {
@@ -20,39 +20,27 @@ export async function GET(request: NextRequest) {
     // Cache key
     const cacheKey = `movers:${window}`;
 
-    // Try cache first
-    const cached = await getCache<MoversResponse>(cacheKey);
-    if (cached) {
-      return NextResponse.json(cached, {
-        headers: {
-          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
-        },
-      });
-    }
+    let response: MoversResponse | null = null;
+    try {
+      const cached = await getCache<MoversResponse>(cacheKey);
+      if ((cached?.movers?.length ?? 0) > 0) response = cached;
+    } catch (_) {}
 
-    let response: MoversResponse;
+    if (!response?.movers?.length) {
+      try {
+        const movers = await getMovers(window, 20);
+        response = movers.length > 0
+          ? { computedAt: new Date().toISOString(), window, movers }
+          : generateMockMovers(window);
+      } catch {
+        response = generateMockMovers(window);
+      }
+    }
+    if (!response || !response.movers?.length) response = generateMockMovers(window);
 
     try {
-      // Try real data first
-      const movers = await getMovers(window, 20);
-      
-      if (movers.length === 0) {
-        console.warn(`No movers found, using mock data for window: ${window}`);
-        response = mockMoversData(window);
-      } else {
-        response = {
-          computedAt: new Date().toISOString(),
-          window,
-          movers,
-        };
-      }
-    } catch (dbError) {
-      console.warn('Database unavailable, using mock data:', dbError);
-      response = mockMoversData(window);
-    }
-
-    // Cache for 30 seconds
-    await setCache(cacheKey, response, { ttl: 30 });
+      await setCache(cacheKey, response, { ttl: 30 });
+    } catch (_) {}
 
     return NextResponse.json(response, {
       headers: {
@@ -61,9 +49,9 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Movers API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    const fallback = generateMockMovers('now');
+    return NextResponse.json(fallback, {
+      headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' },
+    });
   }
 }

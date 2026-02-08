@@ -3,6 +3,8 @@ import { redisConnection } from '../lib/utils/redis';
 import { resolveChannels } from '../lib/jobs/processors/resolveChannels';
 import { pullUploads } from '../lib/jobs/processors/pullUploads';
 import { refreshStats } from '../lib/jobs/processors/refreshStats';
+import { pullComments } from '../lib/jobs/processors/pullComments';
+import { detectBuddingStories } from '../lib/jobs/processors/detectBuddingStories';
 import { deduplicateYouTubeItems } from '../lib/scoring/deduplication';
 import { buildFeedCards } from '../lib/jobs/processors/buildFeedCards';
 import { scheduleYouTubeJobs } from '../lib/jobs/youtubeQueue';
@@ -24,6 +26,12 @@ const youtubeWorker = new Worker('youtube', async (job) => {
         break;
       case 'refresh_stats':
         result = await refreshStats(job);
+        break;
+      case 'pull_comments':
+        result = await pullComments(job);
+        break;
+      case 'detect_budding_stories':
+        result = await detectBuddingStories(job);
         break;
       default:
         throw new Error(`Unknown job: ${job.name}`);
