@@ -25,22 +25,12 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
           <div className="flex items-center gap-3 md:gap-6 min-w-0 flex-shrink-0">
             <img 
               src="/dabbleverse-logo.png" 
-              alt="Dabbleverse Logo" 
-              className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0"
+              alt="Dabbleverse" 
+              className="h-10 md:h-12 w-auto flex-shrink-0"
               style={{
                 filter: 'drop-shadow(0 0 10px rgba(230, 57, 70, 0.4))'
               }}
             />
-            <h1 
-              className="text-2xl md:text-3xl font-black tracking-tight whitespace-nowrap"
-              style={{
-                color: 'var(--color-broadcast-accent)',
-                textShadow: '0 0 20px rgba(230, 57, 70, 0.5), 0 2px 4px rgba(0, 0, 0, 0.8)',
-                letterSpacing: '-0.02em'
-              }}
-            >
-              DABBLEVERSE
-            </h1>
             
             <div 
               className="hidden lg:block w-px h-10 flex-shrink-0" 
