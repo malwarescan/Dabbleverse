@@ -114,7 +114,7 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
         </div>
 
         {/* Mobile subtitle */}
-        <div className="lg:hidden mt-2">
+        <div className="lg:hidden mt-2 text-center">
           <span 
             className="text-xs md:text-sm font-medium" 
             style={{ color: 'var(--color-text-secondary)' }}
