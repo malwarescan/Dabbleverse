@@ -19,17 +19,16 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.6)'
       }}
     >
-      <div className="max-w-7xl mx-auto px-6 py-2">
-        <div className="flex items-center justify-between gap-8">
-          {/* Left: Brand */}
-          <div className="flex items-center gap-3 md:gap-6 min-w-0 flex-shrink-0 h-full">
+      <div className="max-w-7xl mx-auto px-6 py-4 relative">
+        <div className="flex items-center justify-center gap-8">
+          {/* Center: Brand */}
+          <div className="flex items-center justify-center min-w-0 flex-shrink-0">
             <img 
               src="/dabbleverse-logo.png" 
               alt="Dabbleverse" 
-              className="h-16 md:h-20 lg:h-24 w-auto flex-shrink-0 object-contain"
+              className="w-64 sm:w-80 md:w-96 lg:w-[500px] h-auto object-contain"
               style={{
-                filter: 'drop-shadow(0 0 10px rgba(230, 57, 70, 0.4))',
-                maxHeight: '100%'
+                filter: 'drop-shadow(0 0 20px rgba(230, 57, 70, 0.5))'
               }}
             />
             
@@ -46,8 +45,8 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
             </span>
           </div>
 
-          {/* Right: Controls */}
-          <div className="flex items-center gap-3 md:gap-6 flex-shrink-0">
+          {/* Right: Controls - Absolute positioned */}
+          <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-3 md:gap-6 flex-shrink-0">
             {/* Time Window Selector */}
             <div 
               className="flex items-center gap-0.5 md:gap-1 rounded-lg p-0.5 md:p-1" 
