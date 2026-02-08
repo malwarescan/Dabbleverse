@@ -19,16 +19,17 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.6)'
       }}
     >
-      <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="max-w-7xl mx-auto px-6 py-2">
         <div className="flex items-center justify-between gap-8">
           {/* Left: Brand */}
-          <div className="flex items-center gap-3 md:gap-6 min-w-0 flex-shrink-0">
+          <div className="flex items-center gap-3 md:gap-6 min-w-0 flex-shrink-0 h-full">
             <img 
               src="/dabbleverse-logo.png" 
               alt="Dabbleverse" 
-              className="h-12 sm:h-14 md:h-16 lg:h-20 w-auto flex-shrink-0"
+              className="h-16 md:h-20 lg:h-24 w-auto flex-shrink-0 object-contain"
               style={{
-                filter: 'drop-shadow(0 0 10px rgba(230, 57, 70, 0.4))'
+                filter: 'drop-shadow(0 0 10px rgba(230, 57, 70, 0.4))',
+                maxHeight: '100%'
               }}
             />
             
