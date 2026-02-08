@@ -88,7 +88,7 @@ export default function HomePage() {
               <div>
                 <div className="flex items-center justify-between gap-4 mb-3 md:mb-4">
                   <h2 className="text-xl md:text-2xl font-bold max-w-[196px]">
-                    Cows & Characters
+                    Leaders
                   </h2>
                   {/* Time filter - same row, right-aligned */}
                   <div
