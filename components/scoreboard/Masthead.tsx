@@ -23,6 +23,14 @@ export function Masthead({ currentWindow, onWindowChange, lastUpdate }: Masthead
         <div className="flex items-center justify-between gap-8">
           {/* Left: Brand */}
           <div className="flex items-center gap-3 md:gap-6 min-w-0 flex-shrink-0">
+            <img 
+              src="/dabbleverse-logo.png" 
+              alt="Dabbleverse Logo" 
+              className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0"
+              style={{
+                filter: 'drop-shadow(0 0 10px rgba(230, 57, 70, 0.4))'
+              }}
+            />
             <h1 
               className="text-2xl md:text-3xl font-black tracking-tight whitespace-nowrap"
               style={{

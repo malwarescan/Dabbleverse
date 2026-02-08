@@ -8,6 +8,10 @@ export const revalidate = 0;
 export const metadata: Metadata = {
   title: "Dabbleverse Dashboard",
   description: "Real-time cultural stock ticker",
+  icons: {
+    icon: '/dabbleverse-logo.png',
+    apple: '/dabbleverse-logo.png',
+  },
 };
 
 export default function RootLayout({
