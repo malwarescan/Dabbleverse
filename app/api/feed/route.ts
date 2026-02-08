@@ -1,15 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCache, setCache } from '@/lib/utils/redis';
 import { getFeedCards, getFeedCardsFromRecentItems } from '@/lib/utils/queries';
-import { generateMockFeed } from '@/lib/utils/mockData';
 import { WindowType, FeedResponse } from '@/lib/types';
+
+/** Only allow cards that link to real content (no mock # or example.com) */
+function onlyRealCards<T extends { url?: string | null }>(cards: T[]): T[] {
+  return cards.filter(
+    (c) =>
+      c.url &&
+      (c.url.startsWith('http://') || c.url.startsWith('https://')) &&
+      !c.url.includes('example.com')
+  );
+}
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const window = (searchParams.get('window') || 'now') as WindowType;
 
-    // Validate window
     if (!['now', '24h', '7d'].includes(window)) {
       return NextResponse.json(
         { error: 'Invalid window parameter' },
@@ -17,13 +25,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Cache key
     const cacheKey = `feed:${window}`;
 
     let response: FeedResponse | null = null;
     try {
       const cached = await getCache<FeedResponse>(cacheKey);
-      if ((cached?.cards?.length ?? 0) > 0) response = cached;
+      const cachedReal = cached?.cards ? onlyRealCards(cached.cards) : [];
+      if (cachedReal.length > 0) {
+        response = { ...cached!, cards: cachedReal };
+      }
     } catch (_) {}
 
     if (!response?.cards?.length) {
@@ -32,14 +42,25 @@ export async function GET(request: NextRequest) {
         if (cards.length === 0) {
           cards = await getFeedCardsFromRecentItems(50);
         }
-        response = cards.length > 0
-          ? { computedAt: new Date().toISOString(), window, cards }
-          : generateMockFeed(window);
-      } catch {
-        response = generateMockFeed(window);
+        const real = onlyRealCards(cards);
+        response = {
+          computedAt: new Date().toISOString(),
+          window,
+          cards: real,
+        };
+      } catch (e) {
+        console.error('Feed fetch error:', e);
+        response = {
+          computedAt: new Date().toISOString(),
+          window,
+          cards: [],
+        };
       }
     }
-    if (!response || !response.cards?.length) response = generateMockFeed(window);
+
+    if (!response) {
+      response = { computedAt: new Date().toISOString(), window, cards: [] };
+    }
 
     try {
       await setCache(cacheKey, response, { ttl: 30 });
@@ -52,9 +73,15 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Feed API error:', error);
-    const fallback: FeedResponse = generateMockFeed('now');
-    return NextResponse.json(fallback, {
-      headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' },
-    });
+    return NextResponse.json(
+      {
+        computedAt: new Date().toISOString(),
+        window: 'now',
+        cards: [],
+      } as FeedResponse,
+      {
+        headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' },
+      }
+    );
   }
 }

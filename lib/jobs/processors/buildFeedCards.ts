@@ -80,6 +80,8 @@ export async function buildFeedCards(job: Job) {
             set: {
               title: primaryItem.title || 'Untitled',
               meta: JSON.stringify(meta),
+              why,
+              url: primaryItem.url,
               relatedCount: event.relatedCount,
               computedAt: new Date(),
             },
