@@ -57,9 +57,9 @@ export function Masthead(_props: MastheadProps) {
           />
         </div>
 
-        {/* D logo: pops up in left corner when scrolled; recedes when near top */}
+        {/* D logo + Playboard link: pop up when scrolled */}
         <div
-          className="absolute left-4 top-1/2 -translate-y-1/2 transition-all duration-400 ease-out"
+          className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-4 transition-all duration-400 ease-out"
           style={{
             opacity: isScrolled ? 1 : 0,
             transform: isScrolled
@@ -68,7 +68,6 @@ export function Masthead(_props: MastheadProps) {
             pointerEvents: isScrolled ? 'auto' : 'none',
             transition: 'opacity 0.4s ease-out, transform 0.4s ease-out',
           }}
-          aria-hidden
         >
           <img
             src="/dabbleverse-D-isolated.png"
@@ -77,7 +76,15 @@ export function Masthead(_props: MastheadProps) {
             style={{
               filter: 'drop-shadow(0 0 12px rgba(230, 57, 70, 0.4))',
             }}
+            aria-hidden
           />
+          <a
+            href="/playboard"
+            className="text-sm font-bold hover:underline"
+            style={{ color: 'var(--color-broadcast-accent)' }}
+          >
+            Playboard
+          </a>
         </div>
       </div>
     </div>

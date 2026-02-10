@@ -1,8 +1,7 @@
 import { ScoreboardRow } from '@/lib/types';
-import { RankBadge, MomentumBadge, DriverLabelBadge } from '@/components/ui/Badge';
+import { RankBadge, MomentumBadge } from '@/components/ui/Badge';
 import { ScoreBar } from '@/components/ui/ScoreBar';
 import { SourcePills } from '@/components/ui/SourcePills';
-import { DRIVER_LABELS } from '@/lib/types';
 
 interface ScoreboardTableProps {
   rows: ScoreboardRow[];
@@ -71,12 +70,12 @@ export function ScoreboardTable({ rows, onRowClick }: ScoreboardTableProps) {
               <ScoreBar score={row.score} />
             </div>
 
-            {/* Bottom Row: Sources + Driver */}
+            {/* Bottom Row: Sources + Today's profit */}
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <SourcePills sources={row.sources} />
-              {row.driver && (
-                <DriverLabelBadge label={DRIVER_LABELS[row.driver]} />
-              )}
+              <span className="text-sm font-semibold tabular-nums" style={{ color: row.profitToday != null && row.profitToday > 0 ? 'var(--color-momentum-up)' : 'var(--color-text-tertiary)' }}>
+                {row.profitToday != null ? `$${Number(row.profitToday).toFixed(2)}` : '—'}
+              </span>
             </div>
           </button>
         ))}
@@ -108,7 +107,7 @@ export function ScoreboardTable({ rows, onRowClick }: ScoreboardTableProps) {
             <div>Score</div>
             <div>Momentum</div>
             <div>Sources</div>
-            <div>Driver</div>
+            <div>Profit</div>
           </div>
         </div>
 
@@ -162,11 +161,9 @@ export function ScoreboardTable({ rows, onRowClick }: ScoreboardTableProps) {
                   <SourcePills sources={row.sources} />
                 </div>
 
-                {/* Driver */}
-                <div>
-                  {row.driver && (
-                    <DriverLabelBadge label={DRIVER_LABELS[row.driver]} />
-                  )}
+                {/* Profit (today's Super Chat gross) */}
+                <div className="font-semibold tabular-nums" style={{ color: row.profitToday != null && row.profitToday > 0 ? 'var(--color-momentum-up)' : 'var(--color-text-tertiary)' }}>
+                  {row.profitToday != null ? `$${Number(row.profitToday).toFixed(2)}` : '—'}
                 </div>
               </div>
             </button>

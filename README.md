@@ -169,6 +169,18 @@ npm run seed
 npm run seed:youtube   # Or just YouTube watchlist
 ```
 
+### Playboard (Super Chat gross)
+
+Near-real-time **Super Chat & Super Sticker** gross per channel/stream (not net profit):
+
+- **Detect live streams:** Job `detect_live_streams` (every 2 min) finds which tracked channels are live via uploads playlist + `liveStreamingDetails`.
+- **Poll live chat:** Job `poll_live_chat` (every 1 min) calls `liveChatMessages.list`, stores paid events in `monetization_events`, updates `channel_daily_superchat_rollups` and `stream_superchat_rollups`.
+- **APIs:** `GET /api/live/leaderboard`, `GET /api/live/channel/[id]/today`, `GET /api/live/stream/[videoId]/events`, `GET /api/live/recent`.
+- **UI:** `/playboard` — live now cards, **today’s daily profit** by channel, top streams, recent Super Chats.
+- **Daily profit cron:** If the worker isn’t running 24/7, call `GET /api/cron/live` every 1–2 min (e.g. Railway cron). Optional: set `CRON_SECRET` and pass `?secret=CRON_SECRET` or `Authorization: Bearer CRON_SECRET`.
+
+**DB:** Run `npm run db:push` (or apply migrations) so tables `live_streams`, `monetization_events`, `channel_daily_superchat_rollups`, `stream_superchat_rollups` exist. Label is “Super Chat Gross” (viewer spend), not creator net.
+
 ### Breaking stories pipeline
 
 Every new upload (clippers, weekly_wrap, main) is:

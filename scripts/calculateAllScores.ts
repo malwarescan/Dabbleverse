@@ -3,6 +3,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
 import { google } from 'googleapis';
+import { classifyDriver } from '../lib/scoring/calculator';
+import type { WindowType } from '../lib/types';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -206,12 +208,24 @@ async function calculateAll() {
           if (result.rows.length === 0) continue;
           entityId = result.rows[0].id;
         }
+
+        const sourcesBreakdown = { youtube: 1, reddit: 0, x: 0 };
+        const microMomentum = typeof (s as any).microMomentum === 'number' ? (s as any).microMomentum : s.momentum * 0.5;
+        const driverLabel = classifyDriver(
+          sourcesBreakdown,
+          s.momentum,
+          microMomentum,
+          s.mentions,
+          null,
+          i + 1,
+          window.name as WindowType
+        );
         
         await pool.query(
-          `INSERT INTO scores (entity_id, "window", rank, delta_rank, score, momentum, sources_breakdown, event_count, computed_at)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+          `INSERT INTO scores (entity_id, "window", rank, delta_rank, score, momentum, micro_momentum, sources_breakdown, driver_label, event_count, computed_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
            ON CONFLICT (entity_id, "window", computed_at) DO UPDATE
-           SET rank = $3, score = $5, momentum = $6`,
+           SET rank = $3, score = $5, momentum = $6, micro_momentum = $7, driver_label = $9`,
           [
             entityId,
             window.name,
@@ -219,7 +233,9 @@ async function calculateAll() {
             0,
             s.score,
             s.momentum,
-            JSON.stringify({ youtube: s.mentions }),
+            microMomentum,
+            JSON.stringify(sourcesBreakdown),
+            driverLabel,
             s.mentions,
             computedAt
           ]
@@ -230,19 +246,32 @@ async function calculateAll() {
       // Add chatters with same timestamp
       for (let i = 0; i < chatterScores.length; i++) {
         const c = chatterScores[i];
+        const sourcesBreakdown = { youtube: 1, reddit: 0, x: 0 };
+        const microMomentum = c.momentum * 0.5;
+        const driverLabel = classifyDriver(
+          sourcesBreakdown,
+          c.momentum,
+          microMomentum,
+          c.mentions,
+          null,
+          allScores.length + i + 1,
+          window.name as WindowType
+        );
         await pool.query(
-          `INSERT INTO scores (entity_id, "window", rank, delta_rank, score, momentum, sources_breakdown, event_count, computed_at)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+          `INSERT INTO scores (entity_id, "window", rank, delta_rank, score, momentum, micro_momentum, sources_breakdown, driver_label, event_count, computed_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
            ON CONFLICT (entity_id, "window", computed_at) DO UPDATE
-           SET rank = $3, score = $5, momentum = $6`,
+           SET rank = $3, score = $5, momentum = $6, micro_momentum = $7, driver_label = $9`,
           [
             c.entityId,
             window.name,
-            allScores.length + i + 1, // Rank after all other entities
+            allScores.length + i + 1,
             0,
             c.score,
             c.momentum,
-            JSON.stringify({ youtube: c.mentions }),
+            microMomentum,
+            JSON.stringify(sourcesBreakdown),
+            driverLabel,
             c.mentions,
             computedAt
           ]

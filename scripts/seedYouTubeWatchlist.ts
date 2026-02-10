@@ -1,6 +1,9 @@
-import 'dotenv/config';
-import fs from 'fs';
+import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
+
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 import { db } from '../lib/db/index';
 import { sourceAccounts } from '../lib/db/schema';
 import { eq } from 'drizzle-orm';

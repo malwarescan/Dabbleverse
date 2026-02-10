@@ -183,6 +183,12 @@ export function classifyDriver(
     return 'slow_burn';
   }
 
+  // Fallback so Driver column always shows something when there's activity
+  if (momentum > 0) {
+    if (window === '7d') return 'slow_burn';
+    if (eventCount >= 5) return 'breakout';
+    return 'volatile';
+  }
   return null;
 }
 

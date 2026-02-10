@@ -101,6 +101,31 @@ export async function scheduleYouTubeJobs() {
       removeOnFail: false,
     });
     console.log('  ✅ Scheduled: build_feed_cards (every 5 min)');
+
+    // Playboard: detect live streams every 90 sec, poll chat every 10 sec
+    await youtubeQueue.add('detect_live_streams', {}, {
+      repeat: { pattern: '*/2 * * * *' }, // every 2 min (cron min granularity; for 90s use a different approach or accept 2 min)
+      jobId: 'detect_live_streams',
+      removeOnComplete: 20,
+      removeOnFail: false,
+    });
+    console.log('  ✅ Scheduled: detect_live_streams (every 2 min)');
+
+    await youtubeQueue.add('poll_live_chat', {}, {
+      repeat: { pattern: '*/1 * * * *' }, // every 1 min (every 10 sec would need a separate loop or worker)
+      jobId: 'poll_live_chat',
+      removeOnComplete: 30,
+      removeOnFail: false,
+    });
+    console.log('  ✅ Scheduled: poll_live_chat (every 1 min)');
+
+    await youtubeQueue.add('sample_concurrency', {}, {
+      repeat: { pattern: '*/1 * * * *' },
+      jobId: 'sample_concurrency',
+      removeOnComplete: 30,
+      removeOnFail: false,
+    });
+    console.log('  ✅ Scheduled: sample_concurrency (every 1 min)');
     
     console.log('\n🎉 All YouTube jobs scheduled successfully!');
     
@@ -129,6 +154,12 @@ export async function triggerJob(jobName: string, data: any = {}) {
       return await youtubeQueue.add('pull_comments', data);
     case 'detect_budding_stories':
       return await youtubeQueue.add('detect_budding_stories', { window: data.window || '24h' });
+    case 'detect_live_streams':
+      return await youtubeQueue.add('detect_live_streams', {});
+    case 'poll_live_chat':
+      return await youtubeQueue.add('poll_live_chat', data);
+    case 'sample_concurrency':
+      return await youtubeQueue.add('sample_concurrency', data);
     default:
       throw new Error(`Unknown job: ${jobName}`);
   }

@@ -261,3 +261,145 @@ export const jobQueueStatus = pgTable('job_queue_status', {
   statusIdx: index('job_queue_status_status_idx').on(table.status),
   startedAtIdx: index('job_queue_status_started_at_idx').on(table.startedAt),
 }));
+
+// --- Playboard-style live Super Chat tracking ---
+
+export const liveStreamStatusEnum = pgEnum('live_stream_status', ['live', 'ended', 'unavailable']);
+
+/** Currently or recently live streams we're polling for paid chat events */
+export const liveStreams = pgTable('live_streams', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  videoId: varchar('video_id', { length: 255 }).notNull(),
+  sourceAccountId: uuid('source_account_id').notNull().references(() => sourceAccounts.id, { onDelete: 'cascade' }),
+  title: text('title'),
+  startedAt: timestamp('started_at', { withTimezone: true }).notNull(),
+  endedAt: timestamp('ended_at', { withTimezone: true }),
+  status: liveStreamStatusEnum('status').notNull().default('live'),
+  activeLiveChatId: text('active_live_chat_id'),
+  nextPageToken: text('next_page_token'),
+  pollingIntervalMillis: integer('polling_interval_millis'),
+  lastPolledAt: timestamp('last_polled_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  videoIdIdx: uniqueIndex('live_streams_video_id_unique').on(table.videoId),
+  sourceAccountIdx: index('live_streams_source_account_idx').on(table.sourceAccountId),
+  statusIdx: index('live_streams_status_idx').on(table.status),
+}));
+
+/** Raw monetization events: Super Chat, Super Sticker, memberships, gifted (gross) */
+export const monetizationEvents = pgTable('monetization_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  videoId: varchar('video_id', { length: 255 }).notNull(),
+  sourceAccountId: uuid('source_account_id').notNull().references(() => sourceAccounts.id, { onDelete: 'cascade' }),
+  type: varchar('type', { length: 50 }).notNull(), // super_chat | super_sticker | membership_gift | member_milestone
+  amountMicros: integer('amount_micros').notNull().default(0),
+  currency: varchar('currency', { length: 10 }).default('USD').notNull(),
+  /** For membership_gift: number of memberships gifted */
+  giftCount: integer('gift_count'),
+  /** For member_milestone: tier/level name */
+  tier: varchar('tier', { length: 100 }),
+  publishedAt: timestamp('published_at', { withTimezone: true }).notNull(),
+  authorChannelId: varchar('author_channel_id', { length: 255 }),
+  messageId: varchar('message_id', { length: 255 }).notNull(),
+  rawPayload: jsonb('raw_payload'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  messageIdIdx: uniqueIndex('monetization_events_message_id_unique').on(table.messageId),
+  videoIdIdx: index('monetization_events_video_id_idx').on(table.videoId),
+  sourceAccountIdIdx: index('monetization_events_source_account_idx').on(table.sourceAccountId),
+  publishedAtIdx: index('monetization_events_published_at_idx').on(table.publishedAt),
+  typeIdx: index('monetization_events_type_idx').on(table.type),
+}));
+
+/** Breakdown by type: { super_chat: { micros, count }, super_sticker: {...}, membership_gift: {...}, member_milestone: { count } } */
+export const MONETIZATION_BREAKDOWN_TYPES = ['super_chat', 'super_sticker', 'membership_gift', 'member_milestone'] as const;
+
+/** Daily gross rollup per channel with breakdown by type */
+export const channelDailySuperchatRollups = pgTable('channel_daily_superchat_rollups', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  sourceAccountId: uuid('source_account_id').notNull().references(() => sourceAccounts.id, { onDelete: 'cascade' }),
+  date: varchar('date', { length: 10 }).notNull(), // YYYY-MM-DD
+  grossAmountMicros: integer('gross_amount_micros').notNull().default(0),
+  eventCount: integer('event_count').notNull().default(0),
+  /** Per-type: { super_chat: { micros, count }, ... } */
+  breakdown: jsonb('breakdown'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  channelDateIdx: uniqueIndex('channel_daily_superchat_channel_date_unique').on(table.sourceAccountId, table.date),
+  dateIdx: index('channel_daily_superchat_date_idx').on(table.date),
+}));
+
+/** Per-stream gross rollup with breakdown by type */
+export const streamSuperchatRollups = pgTable('stream_superchat_rollups', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  videoId: varchar('video_id', { length: 255 }).notNull(),
+  sourceAccountId: uuid('source_account_id').notNull().references(() => sourceAccounts.id, { onDelete: 'cascade' }),
+  grossAmountMicros: integer('gross_amount_micros').notNull().default(0),
+  eventCount: integer('event_count').notNull().default(0),
+  /** Per-type: { super_chat: { micros, count }, ... } */
+  breakdown: jsonb('breakdown'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  videoIdIdx: uniqueIndex('stream_superchat_rollups_video_id_unique').on(table.videoId),
+  sourceAccountIdx: index('stream_superchat_rollups_source_account_idx').on(table.sourceAccountId),
+}));
+
+// --- Playboard++ unified: concurrency + minute rollups + donor + owner ---
+
+/** Concurrency samples per live stream (poll liveStreamingDetails.concurrentViewers every 30–60s) */
+export const streamConcurrencySamples = pgTable('stream_concurrency_samples', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  videoId: varchar('video_id', { length: 255 }).notNull(),
+  sampledAt: timestamp('sampled_at', { withTimezone: true }).notNull(),
+  concurrentViewers: integer('concurrent_viewers').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  videoIdIdx: index('stream_concurrency_samples_video_id_idx').on(table.videoId),
+  sampledAtIdx: index('stream_concurrency_samples_sampled_at_idx').on(table.sampledAt),
+}));
+
+/** Per-channel per-minute rollup (observed gross + concurrency). Public pipeline. */
+export const channelRollupMinute = pgTable('channel_rollup_minute', {
+  sourceAccountId: uuid('source_account_id').notNull().references(() => sourceAccounts.id, { onDelete: 'cascade' }),
+  minuteTs: timestamp('minute_ts', { withTimezone: true }).notNull(), // bucket start
+  grossAmountMicrosUsd: integer('gross_amount_micros_usd').notNull().default(0),
+  eventCount: integer('event_count').notNull().default(0),
+  uniqueDonors: integer('unique_donors').notNull().default(0),
+  concurrentAvg: integer('concurrent_avg'),
+  concurrentPeak: integer('concurrent_peak'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+}, (table) => ({
+  channelMinuteIdx: uniqueIndex('channel_rollup_minute_channel_minute_unique').on(table.sourceAccountId, table.minuteTs),
+}));
+
+/** Per-channel per-day donor rollup (Phase 2). */
+export const donorRollupDay = pgTable('donor_rollup_day', {
+  sourceAccountId: uuid('source_account_id').notNull().references(() => sourceAccounts.id, { onDelete: 'cascade' }),
+  date: varchar('date', { length: 10 }).notNull(),
+  authorChannelId: varchar('author_channel_id', { length: 255 }).notNull(),
+  grossUsd: real('gross_usd').notNull().default(0),
+  eventCount: integer('event_count').notNull().default(0),
+  firstEventAt: timestamp('first_event_at', { withTimezone: true }),
+  lastEventAt: timestamp('last_event_at', { withTimezone: true }),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+}, (table) => ({
+  donorDayIdx: uniqueIndex('donor_rollup_day_channel_date_author_unique').on(table.sourceAccountId, table.date, table.authorChannelId),
+}));
+
+/** Owner mode: official revenue from YouTube Analytics (Phase 3). */
+export const oauthRevenueDay = pgTable('oauth_revenue_day', {
+  sourceAccountId: uuid('source_account_id').notNull().references(() => sourceAccounts.id, { onDelete: 'cascade' }),
+  date: varchar('date', { length: 10 }).notNull(),
+  estimatedRevenueUsd: real('estimated_revenue_usd'),
+  adRevenueUsd: real('ad_revenue_usd'),
+  transactionRevenueUsd: real('transaction_revenue_usd'),
+  membershipRevenueUsd: real('membership_revenue_usd'),
+  watchTimeMinutes: real('watch_time_minutes'),
+  views: integer('views'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+}, (table) => ({
+  oauthDayIdx: uniqueIndex('oauth_revenue_day_channel_date_unique').on(table.sourceAccountId, table.date),
+}));

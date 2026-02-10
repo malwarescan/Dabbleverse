@@ -2,6 +2,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
+import { classifyDriver } from '../lib/scoring/calculator';
+import type { WindowType } from '../lib/types';
 
 // Load .env.local explicitly
 const __filename = fileURLToPath(import.meta.url);
@@ -115,22 +117,33 @@ async function calculateScores() {
     
     for (let i = 0; i < scores.length; i++) {
       const s = scores[i];
+      const sourcesBreakdown = { youtube: 1, reddit: 0, x: 0 };
+      const microMomentum = s.momentum * 0.5;
+      const driverLabel = classifyDriver(
+        sourcesBreakdown,
+        s.momentum,
+        microMomentum,
+        s.mentions,
+        null,
+        i + 1,
+        'now' as WindowType
+      );
       await pool.query(
         `INSERT INTO scores (entity_id, "window", rank, delta_rank, score, momentum, micro_momentum, sources_breakdown, driver_label, event_count, computed_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
          ON CONFLICT (entity_id, "window", computed_at) DO UPDATE
-         SET rank = $3, score = $5, momentum = $6`,
+         SET rank = $3, score = $5, momentum = $6, micro_momentum = $7, driver_label = $9`,
         [
           s.entityId,
-          'now', // window
-          i + 1, // rank
-          0, // delta_rank
+          'now',
+          i + 1,
+          0,
           s.score,
           s.momentum,
-          null, // micro_momentum
-          JSON.stringify({ youtube: s.mentions }), // sources_breakdown
-          null, // driver_label
-          s.mentions, // event_count
+          microMomentum,
+          JSON.stringify(sourcesBreakdown),
+          driverLabel,
+          s.mentions,
           computedAt
         ]
       );

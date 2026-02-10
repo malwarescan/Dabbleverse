@@ -1,6 +1,64 @@
-import { db, scores, feedCards, entities, items } from '@/lib/db';
-import { eq, desc, and, gt } from 'drizzle-orm';
+import { db, scores, feedCards, entities, items, channelDailySuperchatRollups, streamSuperchatRollups, sourceAccounts } from '@/lib/db';
+import { eq, desc, and, gt, notLike, inArray } from 'drizzle-orm';
 import { WindowType, ScoreboardRow, MoverCard, FeedCardData } from '@/lib/types';
+
+const MICROS_PER_DOLLAR = 1_000_000;
+
+function normalizeName(name: string): string {
+  return (name || '').toLowerCase().replace(/\s+/g, '').replace(/^@/, '');
+}
+
+/** Base of handle for matching: "stutteringjohn7665" -> "stutteringjohn" */
+function handleBase(handle: string): string {
+  return (handle || '').toLowerCase().replace(/\d+/g, '').replace(/\s+/g, '').replace(/^@/, '');
+}
+
+const SEED_VIDEO_PREFIX = 'seed-';
+
+/** Today's Super Chat gross by channel (displayName/handle). Only real (worker) rollups; seeded rows excluded so demo shows when no live data. */
+export async function getTodayProfitByChannelName(): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const realAccountIds = await db
+      .select({ sourceAccountId: streamSuperchatRollups.sourceAccountId })
+      .from(streamSuperchatRollups)
+      .where(notLike(streamSuperchatRollups.videoId, `${SEED_VIDEO_PREFIX}%`));
+    const realIds = [...new Set(realAccountIds.map((r) => r.sourceAccountId))];
+    if (realIds.length > 0) {
+      const rollupRows = await db
+        .select({
+          grossAmountMicros: channelDailySuperchatRollups.grossAmountMicros,
+          displayName: sourceAccounts.displayName,
+          handle: sourceAccounts.handle,
+        })
+        .from(channelDailySuperchatRollups)
+        .innerJoin(sourceAccounts, eq(channelDailySuperchatRollups.sourceAccountId, sourceAccounts.id))
+        .where(
+          and(
+            eq(channelDailySuperchatRollups.date, today),
+            inArray(channelDailySuperchatRollups.sourceAccountId, realIds)
+          )
+        );
+      if (rollupRows.length > 0) {
+        for (const r of rollupRows) {
+          const grossUsd = r.grossAmountMicros / MICROS_PER_DOLLAR;
+          if (r.displayName) map.set(normalizeName(r.displayName), grossUsd);
+          if (r.handle) {
+            map.set(normalizeName(r.handle), grossUsd);
+            map.set(handleBase(r.handle), grossUsd);
+          }
+        }
+        return map;
+      }
+    }
+
+    // No real rollups: return empty — no fake demo amounts
+  } catch (e) {
+    console.error('getTodayProfitByChannelName:', e);
+  }
+  return map;
+}
 
 export async function getScoreboardRows(
   window: WindowType,

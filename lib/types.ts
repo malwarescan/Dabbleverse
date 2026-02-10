@@ -33,6 +33,8 @@ export interface ScoreboardRow {
   sources: SourcesBreakdown;
   driver: DriverLabel | null;
   eventCount: number;
+  /** Today's Super Chat gross (live profit) when entity matches a channel */
+  profitToday?: number | null;
 }
 
 export interface ScoreboardResponse {

@@ -5,6 +5,9 @@ import { pullUploads } from '../lib/jobs/processors/pullUploads';
 import { refreshStats } from '../lib/jobs/processors/refreshStats';
 import { pullComments } from '../lib/jobs/processors/pullComments';
 import { detectBuddingStories } from '../lib/jobs/processors/detectBuddingStories';
+import { detectLiveStreams } from '../lib/jobs/processors/detectLiveStreams';
+import { pollLiveChat } from '../lib/jobs/processors/pollLiveChat';
+import { sampleConcurrency } from '../lib/jobs/processors/sampleConcurrency';
 import { deduplicateYouTubeItems } from '../lib/scoring/deduplication';
 import { buildFeedCards } from '../lib/jobs/processors/buildFeedCards';
 import { scheduleYouTubeJobs } from '../lib/jobs/youtubeQueue';
@@ -32,6 +35,15 @@ const youtubeWorker = new Worker('youtube', async (job) => {
         break;
       case 'detect_budding_stories':
         result = await detectBuddingStories(job);
+        break;
+      case 'detect_live_streams':
+        result = await detectLiveStreams(job);
+        break;
+      case 'poll_live_chat':
+        result = await pollLiveChat(job);
+        break;
+      case 'sample_concurrency':
+        result = await sampleConcurrency(job);
         break;
       default:
         throw new Error(`Unknown job: ${job.name}`);

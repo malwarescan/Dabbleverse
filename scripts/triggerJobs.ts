@@ -42,6 +42,12 @@ async function trigger() {
     console.log('5️⃣ Triggering: build_feed_cards');
     await triggerJob('build_feed_cards');
     
+    // 6. Live / Playboard
+    console.log('\n6️⃣ Triggering: detect_live_streams');
+    await triggerJob('detect_live_streams');
+    console.log('7️⃣ Triggering: poll_live_chat');
+    await triggerJob('poll_live_chat');
+    
     console.log('\n✅ All jobs triggered! Check worker logs for progress.');
     
   } catch (error) {

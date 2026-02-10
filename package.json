@@ -8,6 +8,7 @@
     "dev:alt": "next dev -p 3002",
     "build": "next build",
     "start": "next start",
+    "start:with-worker": "node scripts/start-with-worker.js",
     "lint": "next lint",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
@@ -15,6 +16,8 @@
     "db:migrate": "drizzle-kit migrate",
     "seed": "tsx scripts/seed.ts",
     "seed:youtube": "tsx scripts/seedYouTubeWatchlist.ts",
+    "seed:playboard": "tsx scripts/seedPlayboard.ts",
+    "resolve:channels": "tsx scripts/resolveChannelsDirect.ts",
     "db:setup": "tsx scripts/setupDatabase.ts",
     "worker": "tsx workers/index.ts",
     "worker:dev": "tsx watch workers/index.ts"
