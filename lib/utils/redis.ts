@@ -79,8 +79,9 @@ export async function invalidateCache(pattern: string): Promise<void> {
   }
 }
 
-// Export both the getter function and connection config
+// Export both the getter and the client (worker expects `redis` to be the client or null)
 export { getRedisClient };
+export const redis = getRedisClient();
 
 // Export for BullMQ (requires connection config with maxRetriesPerRequest: null)
 // Parse REDIS_URL so password is included (Railway Redis requires auth)
