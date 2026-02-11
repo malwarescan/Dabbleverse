@@ -9,8 +9,8 @@ const path = require('path');
 
 const root = path.resolve(__dirname, '..');
 
-// Start worker in background (same env as this process)
-const worker = spawn('pnpm', ['run', 'worker'], {
+// Start worker in background (same env as this process). Use npm so it works in Railway/docker where pnpm may not be in PATH.
+const worker = spawn('npm', ['run', 'worker'], {
   cwd: root,
   stdio: 'inherit',
   env: process.env,
