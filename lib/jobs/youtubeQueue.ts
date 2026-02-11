@@ -1,11 +1,33 @@
 import { Queue } from 'bullmq';
 import { redisConnection } from '../utils/redis';
 
-// Define queues
-export const youtubeQueue = new Queue('youtube', { connection: redisConnection });
-export const dedupeQueue = new Queue('dedupe', { connection: redisConnection });
-export const scoreQueue = new Queue('score', { connection: redisConnection });
-export const feedQueue = new Queue('feed', { connection: redisConnection });
+// Lazy queues so no Redis connection at build time (Next.js collect page data can't resolve redis.railway.internal)
+let _youtubeQueue: Queue | null = null;
+let _dedupeQueue: Queue | null = null;
+let _scoreQueue: Queue | null = null;
+let _feedQueue: Queue | null = null;
+
+function getYoutubeQueue() {
+  if (!_youtubeQueue) _youtubeQueue = new Queue('youtube', { connection: redisConnection });
+  return _youtubeQueue;
+}
+function getDedupeQueue() {
+  if (!_dedupeQueue) _dedupeQueue = new Queue('dedupe', { connection: redisConnection });
+  return _dedupeQueue;
+}
+function getScoreQueue() {
+  if (!_scoreQueue) _scoreQueue = new Queue('score', { connection: redisConnection });
+  return _scoreQueue;
+}
+function getFeedQueue() {
+  if (!_feedQueue) _feedQueue = new Queue('feed', { connection: redisConnection });
+  return _feedQueue;
+}
+
+export const youtubeQueue = new Proxy({} as Queue, { get(_, prop) { return (getYoutubeQueue() as Record<string, unknown>)[prop as string]; } });
+export const dedupeQueue = new Proxy({} as Queue, { get(_, prop) { return (getDedupeQueue() as Record<string, unknown>)[prop as string]; } });
+export const scoreQueue = new Proxy({} as Queue, { get(_, prop) { return (getScoreQueue() as Record<string, unknown>)[prop as string]; } });
+export const feedQueue = new Proxy({} as Queue, { get(_, prop) { return (getFeedQueue() as Record<string, unknown>)[prop as string]; } });
 
 // Schedule all recurring jobs
 export async function scheduleYouTubeJobs() {
