@@ -60,6 +60,43 @@ export async function getTodayProfitByChannelName(): Promise<Map<string, number>
   return map;
 }
 
+/** Channels with today's gross for scoreboard profit column — only real (non-seed) rollups. No demo amounts. */
+export async function getLeaderboardChannelsForScoreboard(): Promise<{ displayName: string; handle: string | null; grossUsd: number }[]> {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const realStreamAccountIds = await db
+      .select({ sourceAccountId: streamSuperchatRollups.sourceAccountId })
+      .from(streamSuperchatRollups)
+      .where(notLike(streamSuperchatRollups.videoId, `${SEED_VIDEO_PREFIX}%`));
+    const realIds = [...new Set(realStreamAccountIds.map((r) => r.sourceAccountId))];
+    if (realIds.length === 0) return [];
+    const channelRollups = await db
+      .select({
+        grossAmountMicros: channelDailySuperchatRollups.grossAmountMicros,
+        displayName: sourceAccounts.displayName,
+        handle: sourceAccounts.handle,
+      })
+      .from(channelDailySuperchatRollups)
+      .innerJoin(sourceAccounts, eq(channelDailySuperchatRollups.sourceAccountId, sourceAccounts.id))
+      .where(
+        and(
+          eq(channelDailySuperchatRollups.date, today),
+          inArray(channelDailySuperchatRollups.sourceAccountId, realIds)
+        )
+      )
+      .orderBy(desc(channelDailySuperchatRollups.grossAmountMicros))
+      .limit(20);
+    if (channelRollups.length === 0) return [];
+    return channelRollups.map((r) => ({
+      displayName: r.displayName || r.handle || 'Channel',
+      handle: r.handle,
+      grossUsd: r.grossAmountMicros / MICROS_PER_DOLLAR,
+    }));
+  } catch (_) {
+    return [];
+  }
+}
+
 export async function getScoreboardRows(
   window: WindowType,
   limit: number = 50

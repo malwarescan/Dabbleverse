@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getLeaderboardChannelsForScoreboard } from '@/app/api/live/leaderboard/route';
+import { getLeaderboardChannelsForScoreboard } from '@/lib/utils/queries';
 import { db } from '@/lib/db';
 import { channelDailySuperchatRollups, sourceAccounts, liveStreams } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';

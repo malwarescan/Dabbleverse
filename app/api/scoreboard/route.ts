@@ -3,7 +3,7 @@ import { getCache, setCache } from '@/lib/utils/redis';
 import { getScoreboardRows, getTodayProfitByChannelName } from '@/lib/utils/queries';
 import { generateMockScoreboard } from '@/lib/utils/mockData';
 import { WindowType, ScoreboardResponse } from '@/lib/types';
-import { getLeaderboardChannelsForScoreboard } from '@/app/api/live/leaderboard/route';
+import { getLeaderboardChannelsForScoreboard } from '@/lib/utils/queries';
 
 function normalizeName(name: string): string {
   return (name || '').toLowerCase().replace(/\s+/g, '').replace(/^@/, '');

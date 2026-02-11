@@ -7,48 +7,6 @@ const MICROS_PER_DOLLAR = 1_000_000;
 /** Exclude seeded placeholder rollups (stream video_id starts with this); only worker-written rollups count as real. */
 const SEED_VIDEO_PREFIX = 'seed-';
 
-/** Return channels with displayName, handle, grossUsd for scoreboard profit — only from real (non-seed) rollups. No demo amounts. */
-export async function getLeaderboardChannelsForScoreboard(): Promise<{ displayName: string; handle: string | null; grossUsd: number }[]> {
-  try {
-    const today = new Date().toISOString().slice(0, 10);
-    const realStreamAccountIds = await db
-      .select({ sourceAccountId: streamSuperchatRollups.sourceAccountId })
-      .from(streamSuperchatRollups)
-      .where(notLike(streamSuperchatRollups.videoId, `${SEED_VIDEO_PREFIX}%`));
-    const realIds = [...new Set(realStreamAccountIds.map((r) => r.sourceAccountId))];
-    if (realIds.length === 0) {
-      // No real stream data → fall through to demo
-    } else {
-      const channelRollups = await db
-        .select({
-          grossAmountMicros: channelDailySuperchatRollups.grossAmountMicros,
-          displayName: sourceAccounts.displayName,
-          handle: sourceAccounts.handle,
-        })
-        .from(channelDailySuperchatRollups)
-        .innerJoin(sourceAccounts, eq(channelDailySuperchatRollups.sourceAccountId, sourceAccounts.id))
-        .where(
-          and(
-            eq(channelDailySuperchatRollups.date, today),
-            inArray(channelDailySuperchatRollups.sourceAccountId, realIds)
-          )
-        )
-        .orderBy(desc(channelDailySuperchatRollups.grossAmountMicros))
-        .limit(20);
-      if (channelRollups.length > 0) {
-        return channelRollups.map((r) => ({
-          displayName: r.displayName || r.handle || 'Channel',
-          handle: r.handle,
-          grossUsd: r.grossAmountMicros / MICROS_PER_DOLLAR,
-        }));
-      }
-    }
-    return [];
-  } catch (_) {
-    return [];
-  }
-}
-
 /** GET /api/live/leaderboard — top channels by today's gross Super Chat; top streams */
 export async function GET() {
   try {
