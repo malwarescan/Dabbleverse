@@ -83,12 +83,25 @@ export async function invalidateCache(pattern: string): Promise<void> {
 export { getRedisClient };
 
 // Export for BullMQ (requires connection config with maxRetriesPerRequest: null)
-export const redisConnection = {
-  host: process.env.REDIS_URL?.includes('://') 
-    ? new URL(process.env.REDIS_URL).hostname 
-    : 'localhost',
-  port: process.env.REDIS_URL?.includes('://') 
-    ? parseInt(new URL(process.env.REDIS_URL).port || '6379')
-    : 6379,
-  maxRetriesPerRequest: null,
-};
+// Parse REDIS_URL so password is included (Railway Redis requires auth)
+function getRedisConnectionConfig() {
+  const url = process.env.REDIS_URL;
+  if (!url?.includes('://')) {
+    return { host: 'localhost', port: 6379, maxRetriesPerRequest: null };
+  }
+  try {
+    const u = new URL(url);
+    const config: { host: string; port: number; maxRetriesPerRequest: number | null; password?: string; username?: string } = {
+      host: u.hostname,
+      port: parseInt(u.port || '6379'),
+      maxRetriesPerRequest: null,
+    };
+    if (u.password) config.password = u.password;
+    if (u.username && u.username !== 'default') config.username = u.username;
+    return config;
+  } catch {
+    return { host: 'localhost', port: 6379, maxRetriesPerRequest: null };
+  }
+}
+
+export const redisConnection = getRedisConnectionConfig();
