@@ -147,10 +147,9 @@ export async function pollLiveChat(job: Job) {
         }
       }
 
-      if (newEvents > 0) {
-        totalNew += newEvents;
-        await updateRollups(stream.videoId, stream.sourceAccountId);
-      }
+      if (newEvents > 0) totalNew += newEvents;
+      // Always update rollups so live streams show on Playboard even with $0 (otherwise they only appear after first Super Chat)
+      await updateRollups(stream.videoId, stream.sourceAccountId);
 
       await new Promise((r) => setTimeout(r, Math.max(100, pollingInterval - 100)));
     } catch (err: unknown) {

@@ -10,4 +10,5 @@ cacheDirectories = []
 cmds = ['npm run build']
 
 [start]
-cmd = 'npm run start'
+# Run worker + Next so detect_live_streams / poll_live_chat keep Playboard updated (needs REDIS_URL)
+cmd = 'npm run start:with-worker'
