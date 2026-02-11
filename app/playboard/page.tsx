@@ -151,7 +151,14 @@ export default function PlayboardPage() {
               No real data yet — worker ingests Super Chats when channels go live
             </span>
           ) : (
-            <span className="ml-2 text-xs font-medium" style={{ color: 'var(--color-broadcast-accent)' }}>Live</span>
+            <>
+              <span className="ml-2 text-xs font-medium" style={{ color: 'var(--color-broadcast-accent)' }}>Live</span>
+              {leaderboard?.channels?.length !== undefined && (
+                <span className="ml-2 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+                  — {leaderboard.channels.length} channel{leaderboard.channels.length !== 1 ? 's' : ''} with revenue today (from live streams only; demo seed hidden)
+                </span>
+              )}
+            </>
           )}
         </p>
 
@@ -204,7 +211,7 @@ export default function PlayboardPage() {
             </h2>
             {leaderboard?.channels?.length ? (
               <ul className="space-y-4">
-                {leaderboard.channels.slice(0, 10).map((c, i) => {
+                {leaderboard.channels.map((c, i) => {
                   const breakdownList = formatBreakdown(c.breakdown);
                   return (
                     <li
@@ -258,7 +265,7 @@ export default function PlayboardPage() {
             </h2>
             {leaderboard?.streams?.length ? (
               <ul className="space-y-4">
-                {leaderboard.streams.slice(0, 10).map((s, i) => {
+                {leaderboard.streams.map((s, i) => {
                   const breakdownList = formatBreakdown(s.breakdown);
                   return (
                     <li
