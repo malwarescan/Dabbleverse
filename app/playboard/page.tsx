@@ -60,13 +60,11 @@ export default function PlayboardPage() {
   const [refreshingLive, setRefreshingLive] = useState(false);
 
   const fetchData = async () => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
     try {
-      const [lbRes, recentRes] = await Promise.all([
-        fetch('/api/live/leaderboard'),
-        fetch('/api/live/recent'),
-      ]);
-      const lb = await lbRes.json();
-      const rec = await recentRes.json();
+      const lbRes = await fetch('/api/live/leaderboard', { signal: controller.signal });
+      const lb = lbRes.ok ? await lbRes.json() : { date: '', demo: true, channels: [], streams: [], liveNow: [] };
       setLeaderboard({
         date: lb.date ?? '',
         demo: lb.demo ?? false,
@@ -74,10 +72,25 @@ export default function PlayboardPage() {
         streams: lb.streams ?? [],
         liveNow: lb.liveNow ?? [],
       });
-      if (rec.events) setRecent(rec.events);
+      try {
+        const recentRes = await fetch('/api/live/recent', { signal: controller.signal });
+        const rec = recentRes.ok ? await recentRes.json() : {};
+        if (rec.events) setRecent(rec.events);
+      } catch (_) {
+        // recent is optional
+      }
     } catch (e) {
       console.error(e);
+      const today = new Date().toISOString().slice(0, 10);
+      setLeaderboard({
+        date: today,
+        demo: true,
+        channels: [],
+        streams: [],
+        liveNow: [],
+      });
     } finally {
+      clearTimeout(timeout);
       setLoading(false);
     }
   };
@@ -221,9 +234,14 @@ export default function PlayboardPage() {
                 })}
               </ul>
             ) : (
-              <p className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
-                No daily profit yet today. When MLCPodcast and other channels go live and get Super Chats / memberships, numbers appear here (worker or cron must be running).
-              </p>
+              <div className="text-sm space-y-2" style={{ color: 'var(--color-text-tertiary)' }}>
+                <p>No daily profit yet today.</p>
+                {leaderboard?.demo && (
+                  <p className="text-xs mt-2 p-3 rounded bg-amber-500/10 border border-amber-500/30">
+                    <strong>Setup:</strong> Add Redis on Railway, use start command <code className="text-xs">npm run start:with-worker</code>, set REDIS_URL + DATABASE_URL + YOUTUBE_API_KEY, run <code className="text-xs">pnpm run resolve:channels</code> against the production DB, then hit <a href="/api/cron/live" target="_blank" rel="noopener noreferrer" className="underline">/api/cron/live</a> to trigger the worker. See <a href="https://github.com/malwarescan/Dabbleverse/blob/main/RAILWAY_PLAYBOARD_STEPS.md" target="_blank" rel="noopener noreferrer" className="underline">RAILWAY_PLAYBOARD_STEPS.md</a>.
+                  </p>
+                )}
+              </div>
             )}
           </section>
 
