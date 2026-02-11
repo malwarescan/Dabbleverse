@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { youtubeQueue } from '@/lib/jobs/youtubeQueue';
 
 const CRON_TIMEOUT_MS = 8000;
 
@@ -7,6 +6,7 @@ const CRON_TIMEOUT_MS = 8000;
  * Cron endpoint: trigger StreamDetector + ChatPoller + ConcurrencySampler (Playboard++ public pipeline).
  * Hit every 1–2 min so live streams, paid events, and concurrency are captured.
  * Optional: set CRON_SECRET and pass ?secret=CRON_SECRET or Authorization: Bearer CRON_SECRET
+ * Queue is loaded only at runtime to avoid Redis connection during Next.js build (build has no redis.railway.internal).
  */
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -16,6 +16,7 @@ export async function GET(request: Request) {
   }
 
   const enqueue = async () => {
+    const { youtubeQueue } = await import('@/lib/jobs/youtubeQueue');
     await youtubeQueue.add('detect_live_streams', {}, { jobId: `cron-detect-${Date.now()}` });
     await youtubeQueue.add('poll_live_chat', {}, { jobId: `cron-poll-${Date.now()}` });
     await youtubeQueue.add('sample_concurrency', {}, { jobId: `cron-concurrency-${Date.now()}` });
