@@ -6,7 +6,7 @@ import './youtubeWorker';
 
 // Old workers kept for compatibility (will be migrated)
 import { Worker, Job } from 'bullmq';
-import { redis, redisConnection } from '@/lib/utils/redis';
+import { getRedisClient, redisConnection } from '@/lib/utils/redis';
 import { ingestYouTube } from '@/lib/ingestion/youtube';
 import { ingestReddit } from '@/lib/ingestion/reddit';
 import { deduplicateRecentItems } from '@/lib/scoring/deduplication';
@@ -16,6 +16,8 @@ import type {
   DeduplicationJobData,
 } from '@/lib/jobs/queue';
 
+// Resolve client after env is loaded (don't rely on module eval order)
+const redis = getRedisClient();
 if (!redis) {
   console.error('Redis not configured. Workers cannot start.');
   process.exit(1);
