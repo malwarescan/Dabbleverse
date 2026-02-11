@@ -24,10 +24,10 @@ function getFeedQueue() {
   return _feedQueue;
 }
 
-export const youtubeQueue = new Proxy({} as Queue, { get(_, prop) { return (getYoutubeQueue() as Record<string, unknown>)[prop as string]; } });
-export const dedupeQueue = new Proxy({} as Queue, { get(_, prop) { return (getDedupeQueue() as Record<string, unknown>)[prop as string]; } });
-export const scoreQueue = new Proxy({} as Queue, { get(_, prop) { return (getScoreQueue() as Record<string, unknown>)[prop as string]; } });
-export const feedQueue = new Proxy({} as Queue, { get(_, prop) { return (getFeedQueue() as Record<string, unknown>)[prop as string]; } });
+export const youtubeQueue = new Proxy({} as Queue, { get(_, prop) { return (getYoutubeQueue() as unknown as Record<string, unknown>)[prop as string]; } });
+export const dedupeQueue = new Proxy({} as Queue, { get(_, prop) { return (getDedupeQueue() as unknown as Record<string, unknown>)[prop as string]; } });
+export const scoreQueue = new Proxy({} as Queue, { get(_, prop) { return (getScoreQueue() as unknown as Record<string, unknown>)[prop as string]; } });
+export const feedQueue = new Proxy({} as Queue, { get(_, prop) { return (getFeedQueue() as unknown as Record<string, unknown>)[prop as string]; } });
 
 // Schedule all recurring jobs
 export async function scheduleYouTubeJobs() {
