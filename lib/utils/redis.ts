@@ -1,7 +1,7 @@
 import Redis from 'ioredis';
 
 // Lazy-load Redis client (only create when actually used, not during build)
-let redis: Redis | null = null;
+let redisInstance: Redis | null = null;
 
 function getRedisClient(): Redis | null {
   // Don't connect during Next.js build
@@ -10,21 +10,21 @@ function getRedisClient(): Redis | null {
   }
   
   // Only create connection once
-  if (!redis && process.env.REDIS_URL) {
-    redis = new Redis(process.env.REDIS_URL, {
+  if (!redisInstance && process.env.REDIS_URL) {
+    redisInstance = new Redis(process.env.REDIS_URL, {
       maxRetriesPerRequest: null,
       lazyConnect: true, // Don't connect immediately
     });
     
     // Suppress connection errors during build
-    redis.on('error', (err) => {
+    redisInstance.on('error', (err) => {
       if (process.env.NODE_ENV !== 'production') {
         console.warn('Redis connection warning:', err.message);
       }
     });
   }
   
-  return redis;
+  return redisInstance;
 }
 
 export interface CacheOptions {
